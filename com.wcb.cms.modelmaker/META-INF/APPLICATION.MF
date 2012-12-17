@@ -1,0 +1,11 @@
+Application-Name: com.wcb.cms.modelmaker
+Application-SymbolicName: com.wcb.cms.modelmaker
+Application-ManifestVersion: 1.0
+Application-Version: 1.0.0
+Application-Content: com.wcb.cms.modelmaker.api;version=1.0.0,
+ com.wcb.cms.modelmaker.brain;version=1.0.0,
+ com.wcb.cms.modelmaker.web;version=1.0.0,
+ com.wcb.cms.modelmaker.query;version=1.0.0,
+ com.wcb.cms.modelmaker.persistent.sqlite;version=1.0.0
+Manifest-Version: 1.0
+

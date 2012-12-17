@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:bpresref="http://www.ibm.com/appserver/schemas/8.0/blueprint/resourcereference">
+	
+	<service id="interfaceForBrain" interface="com.wcb.cms.modelmaker.api.AppInterface" ref="App" />
+	<bean id="App" class="com.wcb.cms.modelmaker.brain.core.App">
+		<property name="cmsEntityDtlsDB" ref="cmsEntityDtlsDB" />
+		<property name="selectQueryReader" ref="selectQueryReader"></property>
+	</bean>
+	<reference id="cmsEntityDtlsDB" interface="com.wcb.cms.modelmaker.api.CMSEntityDtlsDB" />
+	<reference id="selectQueryReader" interface="com.wcb.cms.modelmaker.api.SelectQueryReader" />
+	
+</blueprint>

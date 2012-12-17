@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>com.wcb.cms.modelmaker.web</display-name>
+  <servlet>
+		<servlet-name>ModellingResult</servlet-name>
+		<servlet-class>com.wcb.cms.modelmaker.web.servlets.ModellingResult</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ModellingResult</servlet-name>
+		<url-pattern>/ModellingResult</url-pattern>
+	</servlet-mapping>
+	<context-param> 
+	    <description>Location for Sqlite file</description> 
+	    <param-name>Sqlite-File</param-name> 
+	    <param-value>
+	         C:\ZAZA\EntityDtlsSqlite.db
+	     </param-value> 
+	</context-param>
+	<welcome-file-list>
+	    <welcome-file>Home.jsp</welcome-file>
+	</welcome-file-list>
+</web-app>

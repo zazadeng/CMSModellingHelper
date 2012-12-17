@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: com.wcb.cms.modelmaker.api
+Bundle-SymbolicName: com.wcb.cms.modelmaker.api
+Bundle-Version: 1.0.0
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: com.wcb.cms.modelmaker.api
+

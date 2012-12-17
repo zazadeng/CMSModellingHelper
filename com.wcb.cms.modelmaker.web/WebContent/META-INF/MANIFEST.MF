@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Web Services
+Bundle-SymbolicName: com.wcb.cms.modelmaker.web
+Bundle-Version: 1.0.0
+Bundle-ClassPath: WEB-INF/classes
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Web-ContextPath: /modelmaker
+Import-Package: com.wcb.cms.modelmaker.api,
+ javax.el;version="2.0";resolution:=optional,
+ javax.naming,
+ javax.servlet;version="2.5",
+ javax.servlet.annotation;resolution:=optional,
+ javax.servlet.http;version="2.5",
+ javax.servlet.jsp;version="2.0",
+ javax.servlet.jsp.el;version="2.0",
+ javax.servlet.jsp.tagext;version="2.0"
+

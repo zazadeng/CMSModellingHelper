@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ClassPath: antlr-runtime-3.1.3.jar,sqljet-1.0.7.jar,.
+Bundle-Blueprint: OSGI-INF/blueprint/*.xml
+Bundle-Version: 1.0.0.qualifier
+Bundle-Name: Connector to sqlite DB
+Bundle-ManifestVersion: 2
+Import-Package: com.wcb.cms.modelmaker.api
+Bundle-SymbolicName: com.wcb.cms.modelmaker.persistent.sqlite
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+
