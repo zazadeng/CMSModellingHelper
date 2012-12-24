@@ -13,67 +13,68 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.wcb.cms.modelmaker.api.AppInterface;
+import com.wcb.cms.modelmaker.api.RoseModellingResult;
 
 
 
 
 public class ModellingResult extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+
 	private AppInterface application;
 	@Override
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response)
-			throws ServletException, IOException {
+					throws ServletException, IOException {
 		//response.setContentType("text/plain");
 		response.setContentType("application/json");
 		//AsyncContext async = request.startAsync(request, response);
-//System.out.println(request.getParameterMap());
+		//System.out.println(request.getParameterMap());
 		PrintWriter out = response.getWriter();
 		String selectQuery = request.getParameter("sql");
 
-System.out.println("=========>:"+selectQuery);
+		System.out.println("=========>:"+selectQuery);
 
 
 
 
-		String filePath = 
-            getServletContext().getInitParameter("Sqlite-File"); 
+		String filePath =
+				getServletContext().getInitParameter("Sqlite-File");
 
-		
+
 		try {
-			String metaQuery = application.addPlaceHoldersForSelectQuery(selectQuery, filePath);
-			String dynamicQueryStr = application.getDynamicSqlForRose(metaQuery);
-			//inputStructStr =  application.getInputStructForRose(metaQuery).toString();
-			String inputStructStr =  parseStructMap(application.getInputStructForRose(metaQuery));
-			String outputStructStr = parseStructMap(application.getOutputStructForRose(metaQuery));
+			RoseModellingResult result = application.transformSelectQuery(selectQuery, filePath);
+			String dynamicQueryStr = result.getCuramNonStandardSelectQuery();
+			String inputStructStr =  parseStructMap(result.getInputStruct());
+			String outputStructStr = parseStructMap(result.getOutputStruct());
+
 			/*out.println("<HTML>");
 			out.println("<BODY>");
 			out.println("<H1>Transformed SQL</H1> <table border=\"1\"><tr><td>"+ dynamicQueryStr + "</td></tr></table>");
-			
+
 			out.println("<br /><H1>Input Struct</H1> <table border=\"1\"><tr><td>" + inputStructStr + "</td></tr></table>");
-			
+
 			out.println("<br /><H1>Output Struct</H1><table border=\"1\"><tr><td>"+ outputStructStr + "</td></tr></table>");
 			out.println("</BODY>");
 			out.println("</HTML>");*/
-			
+
 			StringWriter stringWriter = new StringWriter();
 			PrintWriter pw = new PrintWriter(stringWriter);
 			pw.println("{");
 			pw.print("\"sql\":\"");
 			pw.print(dynamicQueryStr);
 			pw.println("\",");
-		    pw.print("\"input\":\"");
-		    pw.print(inputStructStr);
-		    pw.println("\",");
-		    pw.print("\"output\":\"");
-		    pw.print(outputStructStr);
-		    pw.println("\"");
-		    pw.println("}");
-		    
-System.out.println("=========<:"+stringWriter);		    
-		    out.print(stringWriter);
-		    pw.close();
+			pw.print("\"input\":\"");
+			pw.print(inputStructStr);
+			pw.println("\",");
+			pw.print("\"output\":\"");
+			pw.print(outputStructStr);
+			pw.println("\"");
+			pw.println("}");
+
+			System.out.println("=========<:"+stringWriter);
+			out.print(stringWriter);
+			pw.close();
 		} catch (Exception e) {
 			if((selectQuery != null )&&(selectQuery.trim().length() == 0)){
 				out.println("Error: no sql enter!");
@@ -88,24 +89,24 @@ System.out.println("=========<:"+stringWriter);
 		}finally{
 
 			out.flush();
-			
+
 		}
-		
-		
-		
+
+
+
 		/*HttpSession session = request.getSession(true);
 		// Set the session valid for 5 secs
 		session.setMaxInactiveInterval(5);
-		
-		
+
+
 		if (session.isNew()) {
 			//do the work
 		}*/
 	}
-	
+
 	@Override
 	public void init() throws ServletException {
-		
+
 		try {
 			InitialContext ctx = new InitialContext();
 			String jndiName = "osgi:service/"+AppInterface.class.getName();
@@ -119,12 +120,12 @@ System.out.println("=========<:"+stringWriter);
 	}
 
 	private String parseStructMap(Map inputStructForRose) {
-		
+
 		String result = inputStructForRose.toString();
 		//final String endOfLineStr = "\r\n";
 		final String endOfLineStr = "<br />";
 		return result.replace("{", "").replace("}", "").replaceAll(",", endOfLineStr).replaceAll("=", ":");
-		
+
 	}
 }
 

@@ -5,17 +5,18 @@ a web app (java OSGi servlet) to help easing WCB CMS development modelling part 
 
 ##Libs that we need(I use) to keep the complier happy
 
-1. We need Eclipse to contain [WTP](http://www.eclipse.org/webtools)(Eclipse Web Tools Platform), there are bundles(specified in the bundle's manifest file) for parsing sql queries; if we download the FOR JAVE EE DEVELOPER distribution will include needed bundles.
+1. We need Eclipse to contain [WTP](http://www.eclipse.org/webtools)(Eclipse Web Tools Platform), there are bundles ((DTP)[http://www.eclipse.org/datatools]) for parsing sql queries; if we download the FOR JAVE EE DEVELOPER distribution will include needed bundles. 
 
 2. Download [ANTLR](www.antlr.org)(antlr-runtime-3.1.3.jar); put this jar under com.wcb.cms.modelmaker.brain/BundleContent and reflesh this project, right click the jar and do "Build Path -> Add to Build Path". Put this jar in com.wcb.cms.modelmaker.persistent.sqlite/BundleContent, and do the same thing as mentioned before to add this jar into the build path of the project.
 
 3. Download [SqlJet](sqljet.com)(sqljet-1.0.7.jar); put this jar under com.wcb.cms.modelmaker.persistent.sqlite/BundleContent and do the same thing as mentioned before to add this jar into the build path of the project.
 
-4. Download [geronimo](http://geronimo.apache.org), remember this location, it will be needed for the coming step.
+4. Download [geronimo](http://geronimo.apache.org)(geronimo-tomcat7-javaee6-3.0.0), remember this location, it will be needed for the coming step.
 
-5.In Eclipse, go to "Preferences -> Server -> Runtime Environment", click "Add...", in the dialog, click "Download additional server adapters" link; pick "geronimo V3.0 Server Adapter" to install; after installation, we will be prompted to restart Eclipse; go back to "Preferences -> Server -> Runtime Environment", click "Apache Geronimo V3.0", Browse to the location in the previous step.
+5. In Eclipse, go to "Preferences -> Server -> Runtime Environment", click "Add...", in the dialog, click "Download additional server adapters" link; pick "geronimo V3.0 Server Adapter" to install; after installation, we will be prompted to restart Eclipse; go back to "Preferences -> Server -> Runtime Environment", click "Apache Geronimo V3.0", Browse to the location in the previous step.
 
-6.For running the Eclipse plug-ins Junit, we need to set target platform, go to "Preferences -> Plug-in Development ->Target Platform", we will have a target definitions called "Apache Geronimo 3.0", please fix these broken locations to the server location mentioned before, and set this as the default. NOW we have more errors in Eclipse, since all the needed bundles loaded in Eclipse are not avaiable now. I put all the following plug-ins(ignore those numbers in the names) from the local Eclipse installation to the hotbundles folder in Apache Geronimo Server directory:
+6. To run the Eclipse plug-ins Junit tests, we need to set target platform, go to "Preferences -> Plug-in Development ->Target Platform", we will have a target definitions called "Apache Geronimo 3.0", please fix these broken locations to the server location mentioned before, and set this as the default. NOW we have more errors in Eclipse, since all the needed bundles loaded in Eclipse are not avaiable now. I put all the following bundles(ignore those numbers in the names) from the local Eclipse installation(the one containing WTP bundles) to the hotbundles folder in Apache Geronimo Server directory:
+
 	com.ibm.icu_4.0.1.v20090822.jar
 	javax.wsdl_1.5.1.v200806030408.jar
 	javax.xml_1.3.4.v200902170245.jar
@@ -63,8 +64,6 @@ a web app (java OSGi servlet) to help easing WCB CMS development modelling part 
 	org.hamcrest.core_1.1.0.v20090501071000.jar
 	org.junit4_4.8.1.v20100525
 	org.junit_4.8.2.v4_8_2_v20110321-1705
-
-
 
 ##Steps we need(I use) to get the web service avaiable
 
