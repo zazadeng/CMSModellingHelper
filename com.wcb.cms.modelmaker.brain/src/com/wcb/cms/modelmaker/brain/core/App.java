@@ -62,13 +62,12 @@ public class App implements AppInterface {
 	public final RoseModellingResult transformSelectQuery(final String selectQuery,
 			final String uri)
 					throws Exception {
-		//TODO uncomment the following
-		/*Map<String,String> intoClauseList = selectQueryReader.retrieveIntoClause(selectQuery);
+		/*Map<String, Map<String, List<String>>> intoClauseList = selectQueryReader.retrieveIntoClause(selectQuery);
 		cmsEntityDtlsDB.connect(uri);
 		List<Map<String,String>> intoStatementMetaDataList = cmsEntityDtlsDB.addDomainDefinition(intoClauseList);
 
 
-		List<Map<String, String>> constAndVarialbeList = selectQueryReader.retrieveConstantAndVariable(selectQuery);
+		Map<String, Map<String, List<String>>> constAndVarialbeList = selectQueryReader.retrieveConstantAndVariable(selectQuery);
 		List<Map<String,String>> constAndVarialbeMetaDataList = cmsEntityDtlsDB.addDomainDefinition(constAndVarialbeList);
 
 		//List<String> results = new ArrayList<>(3);

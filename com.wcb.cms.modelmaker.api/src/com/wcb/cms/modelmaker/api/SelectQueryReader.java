@@ -37,18 +37,18 @@ public interface SelectQueryReader {
 	 * Deal with constant and variables after the top level FROM; although it is totally legitimate to place constants or variables before, we will see if there are real cases...
 	 * @param selectQuery
 	 * @return
+	 * @throws SQLParserInternalException
+	 * @throws SQLParserException
 	 */
-	public List<Map<String, String>> retrieveConstantAndVariable(
-			String selectQuery);
+	public List<CMSEntityEntry> retrieveConstantAndVariable(
+			String selectQuery) throws Exception;
 
 	/**
-	 * Deal with columns within the top level SELECT clause.
-	 * KEY in the map is a column name or a
-	 * VALUE in the map is a list of table names associated with the column(key)
+	 * This method only deal with columns within the First SELECT clause of a SQL query
 	 * @param selectQuery
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String, List<String>> retrieveIntoClause(String selectQuery) throws Exception;
+	public List<CMSEntityEntry> retrieveIntoClause(String selectQuery) throws Exception;
 
 }

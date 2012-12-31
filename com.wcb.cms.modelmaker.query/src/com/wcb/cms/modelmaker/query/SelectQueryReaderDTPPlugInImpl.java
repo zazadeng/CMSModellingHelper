@@ -15,16 +15,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.datatools.modelbase.sql.datatypes.PredefinedDataType;
+import org.eclipse.datatools.modelbase.sql.query.Predicate;
 import org.eclipse.datatools.modelbase.sql.query.PredicateBasic;
 import org.eclipse.datatools.modelbase.sql.query.PredicateBetween;
 import org.eclipse.datatools.modelbase.sql.query.PredicateInValueList;
 import org.eclipse.datatools.modelbase.sql.query.QueryCombined;
 import org.eclipse.datatools.modelbase.sql.query.QueryExpressionBody;
-import org.eclipse.datatools.modelbase.sql.query.QueryExpressionRoot;
 import org.eclipse.datatools.modelbase.sql.query.QueryResultSpecification;
 import org.eclipse.datatools.modelbase.sql.query.QuerySelect;
 import org.eclipse.datatools.modelbase.sql.query.QuerySelectStatement;
-import org.eclipse.datatools.modelbase.sql.query.QueryStatement;
 import org.eclipse.datatools.modelbase.sql.query.QueryValueExpression;
 import org.eclipse.datatools.modelbase.sql.query.ResultColumn;
 import org.eclipse.datatools.modelbase.sql.query.ResultTableAllColumns;
@@ -45,11 +44,11 @@ import org.eclipse.datatools.modelbase.sql.query.ValueExpressionSimple;
 import org.eclipse.datatools.modelbase.sql.query.ValueExpressionVariable;
 import org.eclipse.datatools.sqltools.parsers.sql.SQLParserException;
 import org.eclipse.datatools.sqltools.parsers.sql.SQLParserInternalException;
-import org.eclipse.datatools.sqltools.parsers.sql.query.SQLQueryParseResult;
 import org.eclipse.datatools.sqltools.parsers.sql.query.SQLQueryParserManager;
 import org.eclipse.datatools.sqltools.parsers.sql.query.SQLQueryParserManagerProvider;
 import org.eclipse.emf.common.util.EList;
 
+import com.wcb.cms.modelmaker.api.CMSEntityEntry;
 import com.wcb.cms.modelmaker.api.ColumnInSQL;
 import com.wcb.cms.modelmaker.api.SelectQueryReader;
 import com.wcb.cms.modelmaker.api.TableInSQL;
@@ -208,6 +207,66 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 
 		}catch(ClassCastException e){
 			//that is fine ...
+		}
+		return Collections.emptyMap();
+	}
+
+	private Map<String, Map<String, List<String>>> findPredicateInParentOfValueExpressionSimpleFrom(
+			Object object) {
+		try{
+			ValueExpressionSimple valExp = (ValueExpressionSimple) object;
+
+			if(valExp.getValue().matches("'.*'")){
+				for (Iterator<?> iterator = valExp.eContainer().eAllContents(); iterator
+						.hasNext();) {
+					try{
+						QueryValueExpression queryValueExpression = (QueryValueExpression) iterator.next();
+						Map<String, List<String>> value = new Hashtable<>(1);
+						value.put(queryValueExpression.getName(), findTableNameInValueExpressionColumnFrom(queryValueExpression));
+						if(value.get(queryValueExpression.getName()).size()>0){
+							return Collections.singletonMap(((Predicate)valExp.eContainer()).getSourceInfo().getSourceSnippet(), value);
+						}
+					}catch(ClassCastException ee){
+						//continue;
+					}catch(NullPointerException ee){
+						//continue;
+					}
+				}
+			}
+
+
+		}catch(ClassCastException e){
+			//it is ok
+		}
+		return Collections.emptyMap();
+	}
+
+	private Map<String, Map<String, List<String>>> findPredicateInParentOfValueExpressionVariableFrom(
+			Object next) {
+		try{
+
+			ValueExpressionVariable valExpVar = (ValueExpressionVariable)next;
+			//PredicateBasic parent = (PredicateBasic)valExpVar.eContainer();
+			for (Iterator<?> iterator = valExpVar.eContainer().eAllContents(); iterator
+					.hasNext();) {
+				try{
+					QueryValueExpression queryValueExpression = (QueryValueExpression) iterator.next();
+					Map<String, List<String>> value = new Hashtable<>(1);
+					value.put(queryValueExpression.getName(), findTableNameInValueExpressionColumnFrom(queryValueExpression));
+					if(value.get(queryValueExpression.getName()).size()>0){
+						return Collections.singletonMap(((Predicate)valExpVar.eContainer()).getSourceInfo().getSourceSnippet(), value);
+					}
+				}catch(ClassCastException ee){
+					//continue;
+				}catch(NullPointerException ee){
+					//continue;
+				}
+			}
+
+			//expList.add(theSql);
+
+		}catch(ClassCastException e){
+			//it is ok
 		}
 		return Collections.emptyMap();
 	}
@@ -416,19 +475,32 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 		return null;*/
 	}
 
+
+	/*private void getQuerySelectObjectForCombinedQuery(QueryCombined queryHasUnion, List<QuerySelect> list) {
+		QueryExpressionBody queryExpr = queryHasUnion.getLeftQuery();
+		checkQueryExpressionForQuerySelectObjet(list, queryExpr);
+		queryExpr = queryHasUnion.getRightQuery();
+		checkQueryExpressionForQuerySelectObjet(list, queryExpr);
+	}
+
+	private void checkQueryExpressionForQuerySelectObjet(
+			List<QuerySelect> list, QueryExpressionBody queryExpr) {
+		if(queryExpr == null){
+			//DO NOT need to continue to check the right query
+			return;
+		}else if(queryExpr instanceof QuerySelect){
+			list.add((QuerySelect)queryExpr);
+		}else if(queryExpr instanceof QueryCombined){
+			getQuerySelectObjectForCombinedQuery((QueryCombined)queryExpr, list);
+		}
+	}*/
+
 	@Override
 	public List<String> getBetweenStringValueExprssionList(String sql)
 			throws Exception {
 
 		List<String> expList = new ArrayList<String>();
-		//SQLQueryParserManager parserManager = org.eclipse.datatools.sqltools.parsers.sql.query.SQLQueryParserManagerProvider.getInstance().getParserManager(null, null);
-		//Parse
-		SQLQueryParseResult parseResult = parserManager.parseQuery(sql);
-
-		QueryStatement resultObject = parseResult.getQueryStatement();
-		QuerySelectStatement selectStmt = (QuerySelectStatement)resultObject;
-		QueryExpressionRoot queryExpr = selectStmt.getQueryExpr();
-		QueryExpressionBody queryExprBody = queryExpr.getQuery();
+		QueryExpressionBody queryExprBody = getSelectQueryBody(sql);
 		//TreeIterator<EObject> elements =
 		for (Iterator<?> iterator = queryExprBody.eAllContents(); iterator.hasNext();) {
 			Object next = iterator.next();
@@ -453,14 +525,7 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 	@Override
 	public List<String> getEqualToStringValueExprssionList(String sql) throws SQLParserException, SQLParserInternalException {
 		List<String> expList = new ArrayList<String>();
-		//SQLQueryParserManager parserManager = org.eclipse.datatools.sqltools.parsers.sql.query.SQLQueryParserManagerProvider.getInstance().getParserManager(null, null);
-		//Parse
-		SQLQueryParseResult parseResult = parserManager.parseQuery(sql);
-
-		QueryStatement resultObject = parseResult.getQueryStatement();
-		QuerySelectStatement selectStmt = (QuerySelectStatement)resultObject;
-		QueryExpressionRoot queryExpr = selectStmt.getQueryExpr();
-		QueryExpressionBody queryExprBody = queryExpr.getQuery();
+		QueryExpressionBody queryExprBody = getSelectQueryBody(sql);
 		//TreeIterator<EObject> elements =
 		for (Iterator<?> iterator = queryExprBody.eAllContents(); iterator.hasNext();) {
 			Object next = iterator.next();
@@ -488,37 +553,11 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 		return expList;
 	}
 
-
-	/*private void getQuerySelectObjectForCombinedQuery(QueryCombined queryHasUnion, List<QuerySelect> list) {
-		QueryExpressionBody queryExpr = queryHasUnion.getLeftQuery();
-		checkQueryExpressionForQuerySelectObjet(list, queryExpr);
-		queryExpr = queryHasUnion.getRightQuery();
-		checkQueryExpressionForQuerySelectObjet(list, queryExpr);
-	}
-
-	private void checkQueryExpressionForQuerySelectObjet(
-			List<QuerySelect> list, QueryExpressionBody queryExpr) {
-		if(queryExpr == null){
-			//DO NOT need to continue to check the right query
-			return;
-		}else if(queryExpr instanceof QuerySelect){
-			list.add((QuerySelect)queryExpr);
-		}else if(queryExpr instanceof QueryCombined){
-			getQuerySelectObjectForCombinedQuery((QueryCombined)queryExpr, list);
-		}
-	}*/
-
 	private QuerySelect getFirstQuerySelect(String sql)
 			throws SQLParserException, SQLParserInternalException {
 
 
-		//Parse
-		SQLQueryParseResult parseResult = parserManager.parseQuery(sql);
-
-		QueryStatement resultObject = parseResult.getQueryStatement();
-		QuerySelectStatement selectStmt = (QuerySelectStatement)resultObject;
-		QueryExpressionRoot queryExpr = selectStmt.getQueryExpr();
-		QueryExpressionBody queryExprBody = queryExpr.getQuery();
+		QueryExpressionBody queryExprBody = getSelectQueryBody(sql);
 
 		if (queryExprBody instanceof QueryCombined) {
 			QueryCombined queryHasUnion = (QueryCombined) queryExprBody;
@@ -722,14 +761,7 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 	public List<String> getInStringValueExprssionList(String sql)
 			throws SQLParserException, SQLParserInternalException {
 		List<String> expList = new ArrayList<String>();
-		//SQLQueryParserManager parserManager = org.eclipse.datatools.sqltools.parsers.sql.query.SQLQueryParserManagerProvider.getInstance().getParserManager(null, null);
-		//Parse
-		SQLQueryParseResult parseResult = parserManager.parseQuery(sql);
-
-		QueryStatement resultObject = parseResult.getQueryStatement();
-		QuerySelectStatement selectStmt = (QuerySelectStatement)resultObject;
-		QueryExpressionRoot queryExpr = selectStmt.getQueryExpr();
-		QueryExpressionBody queryExprBody = queryExpr.getQuery();
+		QueryExpressionBody queryExprBody = getSelectQueryBody(sql);
 		//TreeIterator<EObject> elements =
 		for (Iterator<?> iterator = queryExprBody.eAllContents(); iterator.hasNext();) {
 			Object next = iterator.next();
@@ -866,6 +898,15 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 
 	}
 
+	private QueryExpressionBody getSelectQueryBody(String selectQuery)
+			throws SQLParserException, SQLParserInternalException {
+		QuerySelectStatement resultObject = (QuerySelectStatement)parserManager
+				.parseQuery(selectQuery)
+				.getQueryStatement();
+
+		return resultObject.getQueryExpr().getQuery();
+	}
+
 	@Override
 	public Set getTableColumnsSet(String sql) {
 		// TODO Auto-generated method stub
@@ -876,14 +917,7 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 	public Set<TableInSQL> getTableSet(String sql) throws Exception{
 
 		Set<TableInSQL> tables = new HashSet<TableInSQL>();
-		//SQLQueryParserManager parserManager = org.eclipse.datatools.sqltools.parsers.sql.query.SQLQueryParserManagerProvider.getInstance().getParserManager(null, null);
-		//Parse
-		SQLQueryParseResult parseResult = parserManager.parseQuery(sql);
-
-		QueryStatement resultObject = parseResult.getQueryStatement();
-		QuerySelectStatement selectStmt = (QuerySelectStatement)resultObject;
-		QueryExpressionRoot queryExpr = selectStmt.getQueryExpr();
-		QueryExpressionBody queryExprBody = queryExpr.getQuery();
+		QueryExpressionBody queryExprBody = getSelectQueryBody(sql);
 
 		for (Iterator<?> iterator = queryExprBody.eAllContents(); iterator.hasNext();) {
 			Object next = iterator.next();
@@ -1070,23 +1104,9 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 		return Collections.emptyList();
 	}
 
-	private List<String> lookUpTableInDatabase(final TableInDatabase tableInDatabase,
+	private List<String> lookUpTableInDatabase(TableInDatabase tableInDatabase,
 			String columnToFindTable) {
-		if(isStar(columnToFindTable)){
-			return Collections.singletonList(tableInDatabase.getName());
-
-		}
-		EList<?> valueExprColumns = tableInDatabase.getValueExprColumns();
-		for (Iterator<?> iterator = valueExprColumns.iterator(); iterator
-				.hasNext();) {
-			final ValueExpressionColumn column = (ValueExpressionColumn) iterator.next();
-			if(column.getName().equals(columnToFindTable)){
-				return Collections.singletonList(tableInDatabase.getName());
-			}
-
-		}
-		//ambiguity , potential table, add a ? mark at the end
-		return Collections.singletonList(tableInDatabase.getName()+"?");
+		return Collections.singletonList(tableInDatabase.getName());
 	}
 
 	private List<String> lookUpTheFromClause(QuerySelect selectQueryObject, String theColumnToFindTable, Map<String, List<String>> map) {
@@ -1120,30 +1140,56 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 	}
 
 	@Override
-	public List<Map<String, String>> retrieveConstantAndVariable(
-			String selectQuery) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<CMSEntityEntry> retrieveConstantAndVariable(
+			String selectQuery) throws SQLParserException, SQLParserInternalException {
+
+		final Map<String, Map<String, List<String>>> expMap = new Hashtable<String, Map<String, List<String>>>();
+		QueryExpressionBody queryExprBody = getSelectQueryBody(selectQuery);
+		for (Iterator<?> iterator = queryExprBody.eAllContents(); iterator.hasNext();) {
+			final Object next = iterator.next();
+			expMap.putAll(findPredicateInParentOfValueExpressionSimpleFrom(next));//ValueExpressionSimple
+			expMap.putAll(findPredicateInParentOfValueExpressionVariableFrom(next));//ValueExpressionVariable
+
+		}
+		List<CMSEntityEntry> list = new ArrayList<>();
+		for (String sqlElement : expMap.keySet()) {
+			list.add(new CMSEntityEntry().setSqlElement(sqlElement)
+					.setColumn(expMap.get(sqlElement).keySet().iterator().next())
+					.setTable(expMap.get(sqlElement).values().iterator().next().get(0)));
+		}
+		return list;
+
 	}
 
+
 	@Override
-	public Map <String, List<String>> retrieveIntoClause(String selectQuery) throws SQLParserException, SQLParserInternalException {
+	public List<CMSEntityEntry> retrieveIntoClause(String selectQuery) throws SQLParserException, SQLParserInternalException {
 
 		QuerySelect selectQueryObject = getFirstQuerySelect(selectQuery);
 		EList<?> selectClauseColumns = selectQueryObject.getSelectClause();
-		if(selectClauseColumns.isEmpty()){
-			final Map<String, List<String>> map = new Hashtable<String, List<String>>();
 
-			Map<String, List<String>> singletonMap = Collections.singletonMap(STAR, lookUpQuerySelect(selectQueryObject, STAR, map));
-			if(!map.isEmpty() && map.containsKey(STAR)){
+
+		if(selectClauseColumns.isEmpty()){
+			final Map<String, List<String>> map = new Hashtable<>();
+			Map<String, List<String>> anotherMap = Collections.singletonMap(STAR,
+					lookUpQuerySelect(selectQueryObject, STAR, map));
+			//?, didn't happen ...
+			/*if(map.containsKey(STAR)){
 				List<String> list = map.get(STAR);
 				list.addAll(singletonMap.get(STAR));
 				map.put(STAR, list);
 				return map;
+			}*/
+
+			map.putAll(anotherMap);
+			List<CMSEntityEntry> list  = new ArrayList<>();
+			for (String column : map.keySet()) {
+				list.add(new CMSEntityEntry()
+				.setSqlElement(STAR)
+				.setColumn(column)
+				.setPotentialTableList(map.get(column)));
 			}
-			//map is not empty or map does not contain STAR
-			map.putAll(singletonMap);
-			return map;
+			return list;
 		}
 
 		/*
@@ -1152,17 +1198,19 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 		 * at the end, we will have this element in the map:
 		 * columnName(alias) <-> a list of table names
 		 */
-		final Map<String, List<String>> map = new Hashtable<String, List<String>>(selectClauseColumns.size());
+		List<CMSEntityEntry> list  = new ArrayList<>();
 		for (Iterator<?> iterator = selectClauseColumns.iterator(); iterator
 				.hasNext();) {
 			QueryResultSpecification oneSelectClauseColumn = (QueryResultSpecification) iterator.next();
+			//we only will find ONE, so we set the size to ONE
+			Map<String, List<String>> map = new Hashtable<>(1);
 
 			try{
 				final ResultColumn oneResultColumn = (ResultColumn)oneSelectClauseColumn;
 				final QueryValueExpression valueExpr = oneResultColumn.getValueExpr();
 				final String alias = (oneResultColumn.getName() == null)?"":"(" +oneResultColumn.getName() +")";
 
-				//TODO: i see async opportunity ...
+				//TODO: i see parallel (NOT async) opportunity ... once we find one, kill the others
 				map.putAll(findColumnTableMapInValueExpressionColumnFrom(valueExpr, alias));//ValueExpressionColumn
 				map.putAll(findColumnTableMapInValueExpressionCaseSimpleFrom(valueExpr, alias));//ValueExpressionCaseSimple
 				map.putAll(findColumnTableMapInValueExpressionFunctionFrom(valueExpr, alias));//ValueExpressionFunction
@@ -1172,19 +1220,27 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 				e.printStackTrace();
 			}catch(NullPointerException e){
 				//table expression of the QueryResultSpecification is NULL
-				List<String> findTableNameIn = findTableNameIn(selectQueryObject, STAR);
-				List<String> temp = new ArrayList<String>(findTableNameIn.size());
-				for (String string : findTableNameIn) {
-					temp.add(string +"?");
-				}
-				map.put(((ResultColumn)oneSelectClauseColumn).getValueExpr().getName()
-						+ ((oneSelectClauseColumn.getName() == null)?"":"(" + oneSelectClauseColumn.getName() + ")"),
-						temp);
+				//List<String> findTableNameIn = findTableNameIn(selectQueryObject, STAR);
 
+
+
+				Map<String, List<String>> newMap = new HashMap<>();
+				lookUpQuerySelect(selectQueryObject, STAR, newMap );
+				String coloumnWithAlias = ((ResultColumn)oneSelectClauseColumn).getValueExpr().getName()
+						+ ((oneSelectClauseColumn.getName() == null)?"":"(" + oneSelectClauseColumn.getName() + ")");
+				map.put(coloumnWithAlias, newMap.get(coloumnWithAlias.replaceAll("\\(.+\\)", "")));
+				System.out.println();
+
+			}
+			for (String column : map.keySet()) {
+				list.add(new CMSEntityEntry()
+				.setSqlElement(oneSelectClauseColumn.getSourceInfo().getSourceSnippet())
+				.setColumn(column)
+				.setPotentialTableList(map.get(column)));
 			}
 		}
 
-		return map;
+		return list;
 
 	}
 
