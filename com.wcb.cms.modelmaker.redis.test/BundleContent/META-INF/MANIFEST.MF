@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: com.wcb.cms.modelmaker.redis.test
+Bundle-SymbolicName: com.wcb.cms.modelmaker.redis.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Fragment-Host: com.wcb.cms.modelmaker.redis;bundle-version=1.0.0
+Import-Package: org.junit
+

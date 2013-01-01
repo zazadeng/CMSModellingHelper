@@ -2,6 +2,7 @@ package com.wcb.cms.modelmaker.api;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Future;
 
 public class CMSEntityEntry {
 	private String sqlElement;
@@ -10,6 +11,7 @@ public class CMSEntityEntry {
 	private List<String> potentialTableList;
 	private String domainDefinition;
 	private String columnAlias;
+	private Future<String> futureDBValue;
 
 	public CMSEntityEntry(){
 		sqlElement = "";
@@ -18,6 +20,7 @@ public class CMSEntityEntry {
 		potentialTableList = Collections.emptyList();
 		domainDefinition = "";
 		columnAlias = "";
+		futureDBValue = null;
 	}
 	public String getColumn() {
 		return column;
@@ -27,6 +30,9 @@ public class CMSEntityEntry {
 	}
 	public String getDomainDefinition() {
 		return domainDefinition;
+	}
+	public Future<String> getFutureDBValue(){
+		return this.futureDBValue;
 	}
 	public List<String> getPotentialTableList() {
 		return potentialTableList;
@@ -52,6 +58,9 @@ public class CMSEntityEntry {
 	public CMSEntityEntry setDomainDefinition(String domainDefinition) {
 		this.domainDefinition = domainDefinition;
 		return this;
+	}
+	public void setFutureDBValue(Future<String> future) {
+		this.futureDBValue = future;
 	}
 	public CMSEntityEntry setPotentialTableList(List<String> potentialTableList) {
 		this.potentialTableList = potentialTableList;

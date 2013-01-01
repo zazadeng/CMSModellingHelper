@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-Blueprint: OSGI-INF/blueprint/*.xml
+Bundle-Version: 1.0.0.qualifier
+Bundle-Name: com.wcb.cms.modelmaker.redis
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: com.wcb.cms.modelmaker.redis
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: com.wcb.cms.modelmaker.api
+Bundle-ClassPath: netty-3.5.9.Final.jar,
+ lettuce-2.2.0.jar
+

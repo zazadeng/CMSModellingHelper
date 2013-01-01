@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.wcb.cms.modelmaker.api.AppInterface;
 import com.wcb.cms.modelmaker.api.CMSEntityDtlsDB;
+import com.wcb.cms.modelmaker.api.CMSEntityEntry;
 import com.wcb.cms.modelmaker.api.RoseModellingResult;
 import com.wcb.cms.modelmaker.api.SelectQueryReader;
 
@@ -62,21 +63,25 @@ public class App implements AppInterface {
 	public final RoseModellingResult transformSelectQuery(final String selectQuery,
 			final String uri)
 					throws Exception {
-		/*Map<String, Map<String, List<String>>> intoClauseList = selectQueryReader.retrieveIntoClause(selectQuery);
+		final List<CMSEntityEntry> intoClauseList =
+				selectQueryReader.retrieveIntoClause(selectQuery);
 		cmsEntityDtlsDB.connect(uri);
-		List<Map<String,String>> intoStatementMetaDataList = cmsEntityDtlsDB.addDomainDefinition(intoClauseList);
+		cmsEntityDtlsDB.findInDB(intoClauseList);//Async
 
+		final List<CMSEntityEntry> constAndVarialbeList =
+				selectQueryReader.retrieveConstantAndVariable(selectQuery);
+		cmsEntityDtlsDB.findInDB(constAndVarialbeList);//Async
 
-		Map<String, Map<String, List<String>>> constAndVarialbeList = selectQueryReader.retrieveConstantAndVariable(selectQuery);
-		List<Map<String,String>> constAndVarialbeMetaDataList = cmsEntityDtlsDB.addDomainDefinition(constAndVarialbeList);
+		cmsEntityDtlsDB.addDomainDefinition(intoClauseList);
+		cmsEntityDtlsDB.addDomainDefinition(constAndVarialbeList);
 
-		//List<String> results = new ArrayList<>(3);
-		RoseModellingResult result = new RoseModellingResult();
-		result.composeCuramNonStandardSelectQuery(selectQueryReader.getParsedSQL(selectQuery), intoStatementMetaDataList, constAndVarialbeMetaDataList);
-		result.composeInputStruct(intoStatementMetaDataList);
-		result.composeOutputStruct(constAndVarialbeMetaDataList);
-		return result;*/
-		return null;
+		//cmsEntityDtlsDB.close();//Why close? Will the connection still preserved while the application is down?
+
+		final RoseModellingResult result = new RoseModellingResult();
+		result.composeCuramNonStandardSelectQuery(selectQuery, intoClauseList, constAndVarialbeList);
+		result.composeInputStruct(intoClauseList);
+		result.composeOutputStruct(constAndVarialbeList);
+		return result;
 
 
 		/*String selectAndIntoStatement = selectQueryReader.getSelectAndIntoClauses(selectQuery);

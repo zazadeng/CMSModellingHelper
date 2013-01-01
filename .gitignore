@@ -4,3 +4,10 @@
 *.jar
 *.war
 *.ear
+
+packages/
+pubspec.lock
+test/OutputTest/packages
+.children
+
+.DS_Store

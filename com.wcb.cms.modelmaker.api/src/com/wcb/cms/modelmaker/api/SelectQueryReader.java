@@ -33,21 +33,28 @@ public interface SelectQueryReader {
 	public String getTopLevelFromItemString(final String statement) throws Exception;
 
 	/**
+	 * Finds everything Constant and Variable element of a SQL query
+	 * and populates information(table, column, alias ...) into CMSEntityEntry.
 	 * 
-	 * Deal with constant and variables after the top level FROM; although it is totally legitimate to place constants or variables before, we will see if there are real cases...
 	 * @param selectQuery
-	 * @return
-	 * @throws SQLParserInternalException
-	 * @throws SQLParserException
+	 * 			a string representation of a SQL query
+	 * @return a list of information needed to extract Domain definitions
+	 * 
+	 * @throws Exception
+	 * 			most likely SQLParserInternalException or SQLParserException
 	 */
 	public List<CMSEntityEntry> retrieveConstantAndVariable(
 			String selectQuery) throws Exception;
 
 	/**
-	 * This method only deal with columns within the First SELECT clause of a SQL query
+	 * Loops through the First SELECT clause of a SQL query,
+	 * and populates information(table, column, alias ...) into CMSEntityEntry.
+	 * 
 	 * @param selectQuery
-	 * @return
+	 * 			a string representation of a SQL query
+	 * @return a list of information needed to extract Domain definitions
 	 * @throws Exception
+	 * 				most likely SQLParserInternalException or SQLParserException
 	 */
 	public List<CMSEntityEntry> retrieveIntoClause(String selectQuery) throws Exception;
 

@@ -149,13 +149,13 @@ public class SelectQueryReaderDTPPlugInImplTest {
 		 * Select: 	one column
 		 * from: 	Table in database
 		 * 
-		 * no referencing, can NOT assume which table has this column
+		 * no referencing, can NOT assume which table has this column, but wcoclaim doesn't have claimcycleid, so it is a correct query though
 		 */
-		selectQuery = "select claimID SSS from ClaimCycle, wcoclaim";
+		selectQuery = "select claimCycleid SSS from ClaimCycle, wcoclaim";
 		retrieveIntoClause = selectQueryReaderDTPPlugInImpl.retrieveIntoClause(selectQuery);
 		assertEquals(1, retrieveIntoClause.size());
 		for (CMSEntityEntry cmsEntityEntry : retrieveIntoClause) {
-			assertEquals("claimid".toUpperCase(), cmsEntityEntry.getColumn());
+			assertEquals("claimCycleid".toUpperCase(), cmsEntityEntry.getColumn());
 			assertEquals("", cmsEntityEntry.getTable());
 			assertEquals(2, cmsEntityEntry.getPotentialTableList().size());
 			for (String table : cmsEntityEntry.getPotentialTableList()) {
@@ -361,8 +361,7 @@ public class SelectQueryReaderDTPPlugInImplTest {
 		}*/
 	}
 
-	private void selectSTAR() throws SQLParserException,
-	SQLParserInternalException {
+	private void selectSTAR() throws SQLParserException, SQLParserInternalException {
 		String selectQuery = "";
 		/*
 		 * Select: 	*

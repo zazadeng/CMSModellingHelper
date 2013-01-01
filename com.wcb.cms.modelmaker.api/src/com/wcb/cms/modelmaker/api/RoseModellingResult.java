@@ -6,20 +6,20 @@ import java.util.Map;
 public class RoseModellingResult {
 
 	public void composeCuramNonStandardSelectQuery(String parsedSQL,
-			List<Map<String, String>> intoStatementMetaDataList,
-			List<Map<String, String>> constAndVarialbeMetaDataList) {
+			List<CMSEntityEntry> intoStatementMetaDataList,
+			List<CMSEntityEntry> constAndVarialbeMetaDataList) {
 		// TODO Auto-generated method stub
 
 	}
 
 	public void composeInputStruct(
-			List<Map<String, String>> intoStatementMetaDataList) {
+			List<CMSEntityEntry> intoStatementMetaDataList) {
 		// TODO Auto-generated method stub
 
 	}
 
 	public void composeOutputStruct(
-			List<Map<String, String>> constAndVarialbeMetaDataList) {
+			List<CMSEntityEntry> constAndVarialbeMetaDataList) {
 		// TODO Auto-generated method stub
 
 	}
