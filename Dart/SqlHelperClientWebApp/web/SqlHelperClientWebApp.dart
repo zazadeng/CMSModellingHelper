@@ -27,7 +27,9 @@ void main() {
  
   query(textarea_submit_id).on.click.add(hideText);
   query(textarea_submit_id).on.blur.add(showText);
-  query(button_send_id).on.click.add(submitSql);
+  query(button_send_id)
+    ..text = "click me!"
+    ..on.click.add(submitSql);
   query(textarea_sql_id).on.mouseUp.add(highlightText);
   query(replace_text_id).on.click.add(removeAllInputValue);
   query(replace_text_id).on.keyUp.add((Event e){
@@ -185,6 +187,8 @@ onSuccess(HttpRequest req) {
   final RegExp regExp = new RegExp(r"<br />(\s*)");
   inputStruct.text = jsonMap["input"].replaceAll(regExp,"\n");
   outStruct.text = jsonMap["output"].replaceAll(regExp,"\n");
-   
+  
+  query("#result").style.display = "inline";
 }
+
 

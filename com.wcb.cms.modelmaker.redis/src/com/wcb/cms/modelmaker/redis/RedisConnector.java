@@ -18,12 +18,14 @@ public class RedisConnector implements CMSEntityDtlsDB{
 	private RedisAsyncConnection<String, String> asyncConnection;
 
 	@Override
-	public void addDomainDefinition(List<CMSEntityEntry> list) throws InterruptedException, ExecutionException, IOException{
+	public void addAttributeAndDomainDefinition(List<CMSEntityEntry> list) throws InterruptedException, ExecutionException, IOException{
 		for (CMSEntityEntry cmsEntityEntry : list) {
 			Future<String> future = cmsEntityEntry.getFutureDBValue();
-			String string;
-			string = future.get();
-			cmsEntityEntry.setDomainDefinition(findPatternFrom("DomainDef:", string));
+			String string = future.get();
+			cmsEntityEntry.setDomainDefinition(
+					findPatternFrom("DomainDef:", string))
+					.setAttribute(
+							findPatternFrom("Attribute:", string));
 		}
 	}
 
@@ -65,10 +67,10 @@ public class RedisConnector implements CMSEntityDtlsDB{
 	}
 
 	private String findPatternFrom(String pattern, String jsonString) throws IOException {
-		Pattern compile = Pattern.compile(pattern+".+"+"((, )|})");
+		Pattern compile = Pattern.compile("("+ pattern+".+"+","+")|(" + pattern+".+"+"}"+ ")");
 		Matcher matcher = compile.matcher(jsonString);
 		while(matcher.find()){
-			return matcher.group().replaceFirst(pattern, "").replaceFirst("}", "");
+			return matcher.group().replaceFirst(pattern, "").replaceFirst("\\W", "");
 		}
 		throw new IOException("This returned value \""
 				+ jsonString

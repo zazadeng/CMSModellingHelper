@@ -7,7 +7,9 @@
 
 packages/
 pubspec.lock
-test/OutputTest/packages
+test/packages
 .children
+*.js
+*.js.*
 
 .DS_Store

@@ -12,7 +12,7 @@ public interface CMSEntityDtlsDB {
 	 * @throws Exception
 	 * 			CAN NOT continue, because it will give us a WRONG answer.
 	 */
-	void addDomainDefinition(List<CMSEntityEntry> list) throws Exception;
+	void addAttributeAndDomainDefinition(List<CMSEntityEntry> list) throws Exception;
 
 	void connect(String uri);
 	/**

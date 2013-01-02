@@ -2,7 +2,6 @@ package com.wcb.cms.modelmaker.web.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Map;
 
 import javax.naming.InitialContext;
@@ -13,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.wcb.cms.modelmaker.api.AppInterface;
-import com.wcb.cms.modelmaker.api.RoseModellingResult;
+import com.wcb.cms.modelmaker.api.CMSRoseModellingResult;
 
 
 
@@ -43,12 +42,13 @@ public class ModellingResult extends HttpServlet {
 
 
 		try {
-			RoseModellingResult result = application.transformSelectQuery(selectQuery, filePath);
+			CMSRoseModellingResult result = application.transformSelectQuery(selectQuery, filePath);
 			String dynamicQueryStr = result.getCuramNonStandardSelectQuery();
 			String inputStructStr =  parseStructMap(result.getInputStruct());
 			String outputStructStr = parseStructMap(result.getOutputStruct());
 
-			/*out.println("<HTML>");
+			/* pass this job(representation of the data) to the client
+			out.println("<HTML>");
 			out.println("<BODY>");
 			out.println("<H1>Transformed SQL</H1> <table border=\"1\"><tr><td>"+ dynamicQueryStr + "</td></tr></table>");
 
@@ -58,7 +58,23 @@ public class ModellingResult extends HttpServlet {
 			out.println("</BODY>");
 			out.println("</HTML>");*/
 
-			StringWriter stringWriter = new StringWriter();
+			/*
+			 * ONLY sends the data down to the client
+			 */
+			out.println("{");
+			out.print("\"sql\":\"");
+			out.print(dynamicQueryStr);
+			out.println("\",");
+			out.print("\"input\":\"");
+			out.print(inputStructStr);
+			out.println("\",");
+			out.print("\"output\":\"");
+			out.print(outputStructStr);
+			out.println("\"");
+			out.println("}");
+
+			//What the hell are u trying to do here?
+			/*StringWriter stringWriter = new StringWriter();
 			PrintWriter pw = new PrintWriter(stringWriter);
 			pw.println("{");
 			pw.print("\"sql\":\"");
@@ -70,21 +86,21 @@ public class ModellingResult extends HttpServlet {
 			pw.print("\"output\":\"");
 			pw.print(outputStructStr);
 			pw.println("\"");
-			pw.println("}");
+			pw.println("}");*/
 
-			System.out.println("=========<:"+stringWriter);
-			out.print(stringWriter);
-			pw.close();
+			System.out.println("=========<:"+out);
+			/*out.print(stringWriter);
+			pw.close();*/
 		} catch (Exception e) {
 			if((selectQuery != null )&&(selectQuery.trim().length() == 0)){
 				out.println("Error: no sql enter!");
 			}else if((e.getMessage() !=null) && e.getMessage().contains("Unable to parse the input")){
 				out.println("Invalid Query! Please enter a valid select query.");
-				//TODO: save the error sql to a file for analysis.
+				//TODO: save the error sql to a file for analysis. Better make it async...
 			}else{
 				out.println("ERROR!!");
 				e.printStackTrace();
-				//TODO: save the error sql and ERROR LOG to a file for analysis.
+				//TODO: save the error sql and ERROR LOG to a file for analysis. Better make it async...
 			}
 		}finally{
 
@@ -119,7 +135,7 @@ public class ModellingResult extends HttpServlet {
 		}
 	}
 
-	private String parseStructMap(Map inputStructForRose) {
+	private String parseStructMap(Map<String, String> inputStructForRose) {
 
 		String result = inputStructForRose.toString();
 		//final String endOfLineStr = "\r\n";

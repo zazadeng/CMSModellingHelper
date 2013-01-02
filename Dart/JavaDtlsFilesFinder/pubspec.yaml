@@ -1,0 +1,6 @@
+name:  JavaDtlsFilesFinder
+description:  A tool to generate redis-SET-command file for mass inserstion of data into redis server.
+
+#dependencies:
+#  js: any
+#  unittest: any

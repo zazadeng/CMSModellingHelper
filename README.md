@@ -7,9 +7,7 @@ a web app (java OSGi servlet) to help easing WCB CMS development modelling part 
 
 1. We need Eclipse to contain [WTP](http://www.eclipse.org/webtools)(Eclipse Web Tools Platform), there are bundles ((DTP)[http://www.eclipse.org/datatools]) for parsing sql queries; if we download the FOR JAVE EE DEVELOPER distribution will include needed bundles. 
 
-2. Download [ANTLR](www.antlr.org)(antlr-runtime-3.1.3.jar); put this jar under com.wcb.cms.modelmaker.brain/BundleContent and reflesh this project, right click the jar and do "Build Path -> Add to Build Path". Put this jar in com.wcb.cms.modelmaker.persistent.sqlite/BundleContent, and do the same thing as mentioned before to add this jar into the build path of the project.
-
-3. Download [SqlJet](sqljet.com)(sqljet-1.0.7.jar); put this jar under com.wcb.cms.modelmaker.persistent.sqlite/BundleContent and do the same thing as mentioned before to add this jar into the build path of the project.
+2. Download [NETTY](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22io.netty%22%20AND%20a%3A%22netty%22)(3.5.9.Final.jar) and [Lettuce](http://search.maven.org/#search%7Cga%7C1%7Clettuce)(lettuce-2.2.0.jar); put these two JARs under com.wcb.cms.modelmaker.redis/BundleContent and reflesh this project, right click the jar and do "Build Path -> Add to Build Path". Put this jar in com.wcb.cms.modelmaker.persistent.sqlite/BundleContent, and do the same thing as mentioned before to add this jar into the build path of the project. Also, add these two JARs to the Classpath under the Runtime tab in the MANIFEST.MF file.
 
 4. Download [geronimo](http://geronimo.apache.org)(geronimo-tomcat7-javaee6-3.0.0), remember this location, it will be needed for the coming step.
 
@@ -69,10 +67,11 @@ a web app (java OSGi servlet) to help easing WCB CMS development modelling part 
 
 1.	a generated sqlite file through createDB method in App.java;
 2.	get the web server geronimo(geronimo-tomcat7-javaee6-3.0.0) runnnig and deploy this OSGi bundle in; for development, download the OSGi Application Developement Tools though Eclipse; it will help making the bundle and deoploy the bundle to geronimo automatically.
-3. 	localhost:8080 will give us the server; or http://localhost:8080/modelmaker/ will give us this web service.
+3. 	localhost:8080 will give us the server; and now http://localhost:8080/modelmaker/ will give us this web service.
 
 ##TODOs
-
-- a dart client implementation will be used instead of the boring jsp page.
-- a dart implementation will be used to generate a redis-script file; of course for the database, we will be using Redis instead of Sqlite, so the dependency on **ANTLR** and **SqlJet** will be a history.
 - make the servlet async.
+
+##REMOVED From TODOs
+- a dart client side brower app(this app will target any brower) will be used instead of do-it-all service from the server side: UI and Logic concerns are seperated now.
+- a dart implementation will be used to generate a redis-script file; of course for the database, we will be using Redis instead of Sqlite, so the dependency on **ANTLR** and **SqlJet** will be a history.

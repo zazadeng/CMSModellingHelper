@@ -451,15 +451,15 @@ public class SelectQueryReaderDTPPlugInImplTest {
 		 * Select:	*
 		 * From:	Query Select
 		 */
-		selectQuery = "select * from (select claimcycleid from claimcycle,caseheader) cc";
+		selectQuery = "select * from (select claimcycleid from claimcycle,caseheader) cc, wcoclaim";
 		retrieveIntoClause = selectQueryReaderDTPPlugInImpl.retrieveIntoClause(selectQuery);
 		assertEquals(2, retrieveIntoClause.size());
 		for (CMSEntityEntry cmsEntityEntry : retrieveIntoClause) {
 			if(cmsEntityEntry.getColumn().equals("*")){
 				assertEquals("*", cmsEntityEntry.getSqlElement());
 				assertEquals("", cmsEntityEntry.getColumnAlias());
-				assertEquals("", cmsEntityEntry.getTable());
-				assertEquals(0, cmsEntityEntry.getPotentialTableList().size());//TODO: can we have something????
+				assertEquals("wcoclaim".toUpperCase(), cmsEntityEntry.getTable());
+				assertEquals(1, cmsEntityEntry.getPotentialTableList().size());
 				assertTrue(cmsEntityEntry.isFunction() == false);
 			}else if(cmsEntityEntry.getColumn().equals("claimcycleid".toUpperCase())){
 				assertEquals("*", cmsEntityEntry.getSqlElement());
@@ -560,7 +560,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 		try {
 			List<CMSEntityEntry> retrieveConstantAndVariable = selectQueryReaderDTPPlugInImpl.retrieveConstantAndVariable(selectQuery);
 			//"{WPMCE.RECORDSTATUSCODE = 'RST1'={RECORDSTATUSCODE=[WKRPOTMTCALCEARN]}, CC.RECORDSTATUSCODE = 'RST1'={RECORDSTATUSCODE=[CLAIMCYCLE]}, OCCCLSAVGREGIONCD <> :regionCode={OCCCLSAVGREGIONCD=[OCCCLSAVGEARN]}, WPMCE.EARNAMTTYPECD = :earnAmtTypeCD={EARNAMTTYPECD=[WKRPOTMTCALCEARN]}, WPE.CLAIMCYCLEID = :claimCycleID={CLAIMCYCLEID=[WKRPOTEARN]}, WPE.RECORDSTATUSCODE = 'RST1'={RECORDSTATUSCODE=[WKRPOTEARN]}, WPE.WKRPOTEARNSTTSCD = 'Finalized'={WKRPOTEARNSTTSCD=[WKRPOTEARN]}}";
-			System.out.println(retrieveConstantAndVariable);
 			assertEquals(9, retrieveConstantAndVariable.size());
 			for (CMSEntityEntry cmsEntityEntry : retrieveConstantAndVariable) {
 				if(cmsEntityEntry.getSqlElement().equals("WPE.CLAIMCYCLEID=:claimCycleID")){

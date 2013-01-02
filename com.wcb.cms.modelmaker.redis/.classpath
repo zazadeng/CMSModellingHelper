@@ -8,7 +8,15 @@
 	</classpathentry>
 	<classpathentry exported="true" kind="con" path="com.ibm.osgi.container"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="BundleContent/lettuce-2.2.0.jar"/>
-	<classpathentry kind="lib" path="BundleContent/netty-3.5.9.Final.jar"/>
+	<classpathentry kind="lib" path="BundleContent/lettuce-2.2.0.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/BundleContent"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="BundleContent/netty-3.5.9.Final.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/BundleContent"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

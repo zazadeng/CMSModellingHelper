@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>CMS Model Helper</title>
+    <link rel="stylesheet" href="SqlHelperClientWebApp.css">
+  </head>
+  <body>
+    <h1>CMS Model Helper</h1>
+    
+    <div id="container">
+      <button id="button">click meee!</button>
+      <br />
+      <textarea id="textarea">Please input a select sql, and click the button above...</textarea>
+      <br />
+      <div id ="replacement" >
+          <input type="text" name="textToReplace" id="textToReplace" >
+          <button id="replaceButton" >replace</button>
+      </div>
+      <table id = "result">
+        <tr>
+          <td id="sql" readonly>Formatted sql will be posted here!</td>
+          <td id="input" readonly>Input struct will be posted here!</td>
+          <td id="output" readonly>Output struct will be posted here!</td>
+        </tr>
+      </table>
+      
+    </div>
+
+    <script type="application/dart" src="SqlHelperClientWebApp.dart"></script>
+    <script src="https://dart.googlecode.com/svn/branches/bleeding_edge/dart/client/dart.js"></script>
+  </body>
+</html>

@@ -1,10 +1,15 @@
 package com.wcb.cms.modelmaker.api;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
 
-public class CMSEntityEntry {
+public final class CMSEntityEntry {
+	private static final String UNDERSCORE = "_";
+	public static synchronized void resetVariableSuffix() {
+		Character = 'z';
+	}
 	private String sqlElement;
 	private String column;
 	private String table;
@@ -12,7 +17,10 @@ public class CMSEntityEntry {
 	private String domainDefinition;
 	private String columnAlias;
 	private Future<String> futureDBValue;
+	private String attribute;
+	private List<String> variableList;
 
+	private static char Character = 'z';
 	public CMSEntityEntry(){
 		sqlElement = "";
 		column = "";
@@ -21,6 +29,18 @@ public class CMSEntityEntry {
 		domainDefinition = "";
 		columnAlias = "";
 		futureDBValue = null;
+		this.variableList =  null;
+
+	}
+	public CMSEntityEntry addVariable(String variable) {
+		if(this.variableList == null){
+			this.variableList = new ArrayList<String>();
+		}
+		this.variableList.add(variable + UNDERSCORE +nextCharacter());
+		return this;
+	}
+	public String getAttribute() {
+		return this.attribute;
 	}
 	public String getColumn() {
 		return column;
@@ -43,8 +63,29 @@ public class CMSEntityEntry {
 	public String getTable() {
 		return table;
 	}
+	public String getVariable(String variable) {
+		for (String var : variableList) {
+			if(var.startsWith(variable+UNDERSCORE)) {
+				return var;
+			}
+		}
+		return "";
+	}
+	public List<String> getVariableList(){
+		return this.variableList;
+	}
 	public boolean isFunction() {
 		return this.table.matches("FUNCTION:\\w+");
+	}
+	private synchronized char nextCharacter() {
+		if(Character == 'z'){
+			Character ='a';
+		}
+		return Character++;
+	}
+	public CMSEntityEntry setAttribute(String attr) {
+		this.attribute = attr;
+		return this;
 	}
 	public CMSEntityEntry setColumn(String column) {
 		if(column.equals("*")){
@@ -59,8 +100,9 @@ public class CMSEntityEntry {
 		this.domainDefinition = domainDefinition;
 		return this;
 	}
-	public void setFutureDBValue(Future<String> future) {
+	public CMSEntityEntry setFutureDBValue(Future<String> future) {
 		this.futureDBValue = future;
+		return this;
 	}
 	public CMSEntityEntry setPotentialTableList(List<String> potentialTableList) {
 		this.potentialTableList = potentialTableList;

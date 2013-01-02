@@ -38,7 +38,6 @@ public class RedisConnectorTest {
 
 			@Override
 			public boolean cancel(boolean mayInterruptIfRunning) {
-				// TODO Auto-generated method stub
 				return false;
 			}
 
@@ -50,19 +49,16 @@ public class RedisConnectorTest {
 			@Override
 			public String get(long timeout, TimeUnit unit) throws InterruptedException,
 			ExecutionException, TimeoutException {
-				// TODO Auto-generated method stub
 				return null;
 			}
 
 			@Override
 			public boolean isCancelled() {
-				// TODO Auto-generated method stub
 				return false;
 			}
 
 			@Override
 			public boolean isDone() {
-				// TODO Auto-generated method stub
 				return false;
 			}
 		};
@@ -70,7 +66,7 @@ public class RedisConnectorTest {
 	}
 
 	@Test
-	public void testAddDomainDefinition() {
+	public void testAddAttributeAndDomainDefinition() {
 		List<CMSEntityEntry> testList = new ArrayList<>();
 		CMSEntityEntry entry = new CMSEntityEntry();
 		entry.setColumn("CLAIMCYCLEID");
@@ -79,9 +75,10 @@ public class RedisConnectorTest {
 
 		redisConnector.findInDB(testList);
 		try {
-			redisConnector.addDomainDefinition(testList);
+			redisConnector.addAttributeAndDomainDefinition(testList);
 			for (CMSEntityEntry cmsEntityEntry : testList) {
 				assertEquals("CLAIM_CYCLE_ID", cmsEntityEntry.getDomainDefinition());
+				assertEquals("claimCycleId", cmsEntityEntry.getAttribute());
 			}
 		} catch (InterruptedException | ExecutionException | IOException e) {
 			e.printStackTrace();
@@ -97,7 +94,7 @@ public class RedisConnectorTest {
 		entry.setFutureDBValue(makeMockFuture("Inncorrct Format"));
 		testList.add(entry);
 
-		redisConnector.addDomainDefinition(testList);
+		redisConnector.addAttributeAndDomainDefinition(testList);
 
 	}
 

@@ -1,0 +1,6 @@
+name:  test
+description:  A test class to check the output from CMSJavaDtlsFilesReader
+
+dependencies:
+  unittest: 
+    hosted: unittest
