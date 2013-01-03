@@ -15,6 +15,7 @@ import com.wcb.cms.modelmaker.api.SelectQueryReader;
  * this class, and consequently one instance of this class's field(bundle objects),
  * so in order to achieve unit testing, RoseModellingResultImpl is implemented.
  * Or else, why do we use blueprint to achieve dependency injection!
+ *
  */
 public class App implements AppInterface {
 	/**
