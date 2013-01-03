@@ -67,7 +67,7 @@ a web app (java OSGi servlet) to help easing WCB CMS development modelling part 
 
 ##Steps we need(I use) to get the web service avaiable
 
-1.	Redis DB is on with all the necessary data populated(done through [this](https://github.com/zazadeng/CMSModellingHelper/tree/master/Dart/JavaDtlsFilesFinder) tool).
+1.	[Redis](http://redis.io/download)(2.6.7) is on, and with all the necessary data populated(done through [this](https://github.com/zazadeng/CMSModellingHelper/tree/master/Dart/JavaDtlsFilesFinder) tool).
 
 2.	*For development*, right click cms.wcb.cms.modelmaker, "Run As" -> "Run on Server" (of course, "Debug As" is highly possible). 
 
