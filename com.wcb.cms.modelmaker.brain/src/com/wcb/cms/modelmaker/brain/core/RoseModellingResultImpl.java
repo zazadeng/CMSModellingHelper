@@ -8,7 +8,10 @@ import java.util.regex.Pattern;
 
 import com.wcb.cms.modelmaker.api.CMSEntityEntry;
 import com.wcb.cms.modelmaker.api.CMSRoseModellingResult;
-
+/**
+ * A helper class to stitch the end product of all bundle
+ * objects produced.
+ */
 public final class RoseModellingResultImpl implements CMSRoseModellingResult {
 
 	private String dynamicSql;
