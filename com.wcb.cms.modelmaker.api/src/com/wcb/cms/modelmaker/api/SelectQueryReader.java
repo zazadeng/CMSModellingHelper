@@ -1,7 +1,9 @@
 package com.wcb.cms.modelmaker.api;
 
 import java.util.List;
-
+/**
+ * Define what we need from a SQL query reader.
+ */
 public interface SelectQueryReader {
 
 	/**

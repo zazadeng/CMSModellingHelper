@@ -5,6 +5,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
 
+/**
+ * A helper class for communication
+ */
 public final class CMSEntityEntry {
 	private static final String UNDERSCORE = "_";
 	public static synchronized void resetVariableSuffix() {
