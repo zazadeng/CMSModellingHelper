@@ -67,14 +67,13 @@ a web app (java OSGi servlet) to help easing WCB CMS development modelling part 
 
 ##Steps we need(I use) to get the web service avaiable
 
-1.	[Redis](http://redis.io/download)(2.6.7) is on, and with all the necessary data populated(done through [this](https://github.com/zazadeng/CMSModellingHelper/tree/master/Dart/JavaDtlsFilesFinder) tool).
+1.	[Redis](http://redis.io/download)(2.6.7) is on, and with all the necessary data populated(done through JavaDtlsFilesFinder.dart under /Dart/JavaDtlsFilesFinder).
 
 2.	*For development*, right click cms.wcb.cms.modelmaker, "Run As" -> "Run on Server" (of course, "Debug As" is highly possible). 
 
 	*For production*, get the web server geronimo(geronimo-tomcat7-javaee6-3.0.0) runnnig and put this OSGi bundle(through right-clicking cms.wcb.cms.modelmaker, and "Export" -> "OSGi application" in Eclipse) in the **hotbundles** folder;
 
-3. 	localhost:8080 will give us the server; and now http://localhost:8080/modelmaker/ will direct us to the home.jsp of this web service; attempt to run a query in this jsp will return us a pain result (Jason format); try using [this](https://github.com/zazadeng/CMSModellingHelper/tree/master/Dart/SqlHelperClientWebApp) client side broswer app to give us a more intuitive representation of the result.
-
+3. 	localhost:8080 will give us the server; and now http://localhost:8080/modelmaker/ will direct us to the home.jsp of this web service; attempt to run a query in this jsp will return us a pain result (Jason format); try firing up SqlHelperClientWebApp.html under /Dart/SqlHelperClientWebApp to give us a more intuitive representation of the result.
 ##TODOs
 - make the servlet async.
 
