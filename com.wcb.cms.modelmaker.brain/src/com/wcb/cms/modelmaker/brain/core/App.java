@@ -13,9 +13,8 @@ import com.wcb.cms.modelmaker.api.SelectQueryReader;
  * The hub to glue all dependent bundle objects.
  * The servlet will only hold ONE instance of
  * this class, and consequently one instance of this class's field(bundle objects),
- * so in order to achieve unit testing, RoseModellingResultImpl is implemented.
- * Or else, why do we use blueprint to achieve dependency injection!
- *
+ * so in order to achieve concurrency, RoseModellingResultImpl is implemented.
+ * 
  */
 public class App implements AppInterface {
 	/**

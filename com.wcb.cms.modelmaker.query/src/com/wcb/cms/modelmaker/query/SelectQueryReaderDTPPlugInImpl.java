@@ -45,6 +45,12 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 	private final static SQLQueryParserManager parserManager =
 			SQLQueryParserManagerProvider.getInstance().getParserManager(null, null);
 	private static final String STAR = "*";
+	/**
+	 * NOTE: This constructor is needed to make use of Blueprint.
+	 */
+	public SelectQueryReaderDTPPlugInImpl(){
+		//no instance variables ... yeah!
+	}
 
 	private Map<? extends String, ? extends List<String>> findColumnTableMapInValueExpressionCaseSimpleFrom(
 			QueryValueExpression valueExpr, String alias) {

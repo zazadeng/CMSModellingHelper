@@ -1,7 +1,6 @@
 Manifest-Version: 1.0
-Require-Bundle: org.eclipse.datatools.sqltools.parsers.sql.lexer;bundl
- e-version="1.0.1",org.eclipse.datatools.sqltools.parsers.sql.query;bu
- ndle-version="1.0.1"
+Require-Bundle: org.eclipse.datatools.sqltools.parsers.sql.lexer;bundle-version="1.0.1",
+ org.eclipse.datatools.sqltools.parsers.sql.query;bundle-version="1.0.1"
 Bundle-Blueprint: OSGI-INF/blueprint/*.xml
 Bundle-Version: 1.0.0.qualifier
 Bundle-Name: Select Query Reader using DTP plugins

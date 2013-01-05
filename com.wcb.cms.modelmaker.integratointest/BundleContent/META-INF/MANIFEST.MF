@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: com.wcb.cms.modelmaker.integrationtest
+Bundle-SymbolicName: com.wcb.cms.modelmaker.integrationtest
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: com.wcb.cms.modelmaker.integratointest.Activator
+Import-Package: com.wcb.cms.modelmaker.api,
+ javax.naming,
+ org.junit;version="4.8.2",
+ org.osgi.framework
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: com.wcb.cms.modelmaker.integratointest
+Require-Bundle: com.wcb.cms.modelmaker.api;bundle-version="1.0.0",
+ com.wcb.cms.modelmaker.brain;bundle-version="1.0.0",
+ com.wcb.cms.modelmaker.query;bundle-version="1.0.0",
+ com.wcb.cms.modelmaker.redis;bundle-version="1.0.0"
+

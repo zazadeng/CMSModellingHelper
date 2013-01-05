@@ -17,15 +17,28 @@ public class RedisConnector implements CMSEntityDtlsDB{
 
 	private RedisAsyncConnection<String, String> asyncConnection;
 
+	/**
+	 * NOTE: This constructor is needed to make use of Blueprint.
+	 */
+	public RedisConnector(){
+		asyncConnection = null;
+	}
+
 	@Override
 	public void addAttributeAndDomainDefinition(List<CMSEntityEntry> list) throws InterruptedException, ExecutionException, IOException{
 		for (CMSEntityEntry cmsEntityEntry : list) {
-			Future<String> future = cmsEntityEntry.getFutureDBValue();
-			String string = future.get();
-			cmsEntityEntry.setDomainDefinition(
-					findPatternFrom("DomainDef:", string))
-					.setAttribute(
-							findPatternFrom("Attribute:", string));
+			Future<String> returnValue = cmsEntityEntry.getFutureDBReturnValue();
+			try{
+				String string = returnValue.get();
+				cmsEntityEntry.setDomainDefinition(
+						findPatternFrom("DomainDef:", string))
+						.setAttribute(
+								findPatternFrom("Attribute:", string));
+			}catch(NullPointerException e){
+				throw new IOException("There is NO return value from the presistence; please check if this column <"
+						+ cmsEntityEntry.getColumn() + "> is indeed in table <"
+						+ cmsEntityEntry.getTable() + ">.");
+			}
 		}
 	}
 
@@ -51,12 +64,12 @@ public class RedisConnector implements CMSEntityDtlsDB{
 		for (CMSEntityEntry entry : sqlElements) {
 			try {
 				Future<List<String>> futureKeys = asyncConnection.keys(entry.getTable() + "_" + entry.getColumn());
-				setFutureValueIn(entry, futureKeys);
+				setFutureReturnValueIn(entry, futureKeys);
 
 				if(entry.getPotentialTableList().size() > 1){
 					for (String table : entry.getPotentialTableList()) {
 						futureKeys = asyncConnection.keys(table + "_" + entry.getColumn());
-						setFutureValueIn(entry, futureKeys);
+						setFutureReturnValueIn(entry, futureKeys);
 					}
 
 				}
@@ -77,11 +90,11 @@ public class RedisConnector implements CMSEntityDtlsDB{
 				+ "\" is not formatted correctly, please check on the persistent entry.");
 	}
 
-	private void setFutureValueIn(CMSEntityEntry entry, Future<List<String>> futureKeys)
+	private void setFutureReturnValueIn(CMSEntityEntry entry, Future<List<String>> futureKeys)
 			throws InterruptedException, ExecutionException {
 		if(asyncConnection.awaitAll(futureKeys) == false){
 			asyncConnection.awaitAll(1, TimeUnit.NANOSECONDS, futureKeys);
-			setFutureValueIn(entry, futureKeys);
+			setFutureReturnValueIn(entry, futureKeys);
 		}else{
 			for (String aKey : futureKeys.get()) {
 				entry.setFutureDBValue(asyncConnection.get(aKey));

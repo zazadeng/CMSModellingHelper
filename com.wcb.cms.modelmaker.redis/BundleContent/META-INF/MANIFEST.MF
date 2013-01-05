@@ -7,5 +7,6 @@ Bundle-SymbolicName: com.wcb.cms.modelmaker.redis
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: com.wcb.cms.modelmaker.api
 Bundle-ClassPath: netty-3.5.9.Final.jar,
- lettuce-2.2.0.jar
+ lettuce-2.2.0.jar,
+ .
 

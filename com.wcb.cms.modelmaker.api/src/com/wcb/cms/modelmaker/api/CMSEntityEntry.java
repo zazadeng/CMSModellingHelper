@@ -54,7 +54,7 @@ public final class CMSEntityEntry {
 	public String getDomainDefinition() {
 		return domainDefinition;
 	}
-	public Future<String> getFutureDBValue(){
+	public Future<String> getFutureDBReturnValue(){
 		return this.futureDBValue;
 	}
 	public List<String> getPotentialTableList() {

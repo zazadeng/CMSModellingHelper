@@ -38,8 +38,8 @@ public class ModellingResult extends HttpServlet {
 
 
 		String filePath =
-				getServletContext().getInitParameter("Sqlite-File");
-
+				//		getServletContext().getInitParameter("Sqlite-File");
+				"localhost"; //for redis
 
 		try {
 			CMSRoseModellingResult result = application.transformSelectQuery(selectQuery, filePath);
@@ -128,7 +128,7 @@ public class ModellingResult extends HttpServlet {
 			String jndiName = "osgi:service/"+AppInterface.class.getName();
 			application = (AppInterface) ctx.lookup(jndiName);
 		} catch (NamingException e) {
-			getServletContext().log("Can't find name", e);
+			getServletContext().log("Can't find name ", e);
 			throw new ServletException("can NOT find this service: "
 					+ e.getExplanation());
 			//+ e.getLocalizedMessage());

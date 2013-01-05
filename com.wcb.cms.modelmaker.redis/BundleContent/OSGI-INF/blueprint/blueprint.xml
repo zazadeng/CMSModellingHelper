@@ -1,3 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:bpresref="http://www.ibm.com/appserver/schemas/8.0/blueprint/resourcereference">
+	<service interface="com.wcb.cms.modelmaker.api.CMSEntityDtlsDB" ref="RedisConnector"></service>
+	<bean id="RedisConnector" class="com.wcb.cms.modelmaker.redis.RedisConnector">
+	</bean>
 </blueprint>

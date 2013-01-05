@@ -15,7 +15,7 @@ a web app (java OSGi servlet) to help easing WCB CMS development modelling part 
 
 4. In Eclipse, go to "Preferences -> Server -> Runtime Environment", click "Add...", in the dialog, click "Download additional server adapters" link; pick "geronimo V3.0 Server Adapter" to install; after installation, we will be prompted to restart Eclipse; go back to "Preferences -> Server -> Runtime Environment", click "Apache Geronimo V3.0", Browse to the location in the previous step.
 
-5. To run the Eclipse plug-ins Junit tests, we need to set target platform, go to "Preferences -> Plug-in Development ->Target Platform", we will have a target definitions called "Apache Geronimo 3.0", please fix these broken locations to the server location mentioned before, and set this as the default. NOW we have more errors in Eclipse, since all the needed bundles loaded in Eclipse are not avaiable now. I put all of the following bundles(ignore those numbers in the names) from the local Eclipse installation(the one containing WTP bundles) to the **hotbundles** folder in Apache Geronimo Server directory to get the app up and running:
+5. We need to set target platform to reference needed bundles for development; go to "Preferences -> Plug-in Development ->Target Platform", we will have a target definitions called "Apache Geronimo 3.0", please fix these broken locations to the server location mentioned before, and set this as the default. NOW we have more errors in Eclipse, since all the needed bundles loaded in Eclipse are not avaiable now. I put all of the following bundles(ignore those numbers in the names) from the local Eclipse installation(the one containing WTP bundles) to the **hotbundles** folder in Apache Geronimo Server directory to get the app up and running:
 
 	com.ibm.icu_4.0.1.v20090822.jar
 	javax.wsdl_1.5.1.v200806030408.jar
@@ -74,6 +74,7 @@ a web app (java OSGi servlet) to help easing WCB CMS development modelling part 
 	*For production*, get the web server geronimo(geronimo-tomcat7-javaee6-3.0.0) runnnig and put this OSGi bundle(through right-clicking cms.wcb.cms.modelmaker, and "Export" -> "OSGi application" in Eclipse) in the **hotbundles** folder;
 
 3. 	localhost:8080 will give us the server; and now http://localhost:8080/modelmaker/ will direct us to the home.jsp of this web service; attempt to run a query in this jsp will return us a pain result (Jason format); try firing up SqlHelperClientWebApp.html under /Dart/SqlHelperClientWebApp to give us a more intuitive representation of the result.
+
 ##TODOs
 - make the servlet async.
 

@@ -109,7 +109,7 @@ public class RedisConnectorTest {
 		redisConnector.findInDB(testList);
 
 		for (CMSEntityEntry cmsEntityEntry : testList) {
-			assertTrue(cmsEntityEntry.getFutureDBValue() != null);
+			assertTrue(cmsEntityEntry.getFutureDBReturnValue() != null);
 		}
 	}
 
@@ -124,7 +124,7 @@ public class RedisConnectorTest {
 		redisConnector.findInDB(testList);
 
 		for (CMSEntityEntry cmsEntityEntry : testList) {
-			assertTrue(cmsEntityEntry.getFutureDBValue() == null);
+			assertTrue(cmsEntityEntry.getFutureDBReturnValue() == null);
 		}
 	}
 
