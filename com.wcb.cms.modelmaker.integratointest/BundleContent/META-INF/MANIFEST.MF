@@ -7,6 +7,8 @@ Bundle-Activator: com.wcb.cms.modelmaker.integratointest.Activator
 Import-Package: com.wcb.cms.modelmaker.api,
  javax.naming,
  org.junit;version="4.8.2",
+ org.junit.runner;version="4.8.2",
+ org.junit.runner.notification;version="4.8.2",
  org.osgi.framework
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: com.wcb.cms.modelmaker.integratointest

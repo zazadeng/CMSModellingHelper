@@ -1,5 +1,7 @@
 package com.wcb.cms.modelmaker.integratointest;
 
+import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -12,9 +14,19 @@ public class Activator implements BundleActivator {
 	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
-		System.out.println("Integration TESTING >>>>>>>>");
-		new IntegrationTest("localhost");
+		System.out.println("Integration testing >>>>>>>> STARTED");
+		Result testResult = org.junit.runner.JUnitCore.runClasses(IntegrationTest.class);
+		if(testResult.wasSuccessful()){
+			System.out.println("Integration testing >>>>>>>> SUCESSED");
+		}
+		for (Failure failure : testResult.getFailures()) {
+			System.err.println(failure.getTrace().
+					replaceFirst("test.IntegrationTest.runCase",
+							"**********test.IntegrationTest***.runCase"));
+		}
 	}
+
+
 
 	/*
 	 * (non-Javadoc)

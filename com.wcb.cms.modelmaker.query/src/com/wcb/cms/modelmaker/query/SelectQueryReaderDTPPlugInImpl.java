@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.wcb.cms.modelmaker.query;
 
 import java.util.ArrayList;
@@ -40,6 +37,9 @@ import org.eclipse.emf.common.util.EList;
 import com.wcb.cms.modelmaker.api.CMSEntityEntry;
 import com.wcb.cms.modelmaker.api.SelectQueryReader;
 
+/**
+ * Implementation of SelectQueryReader
+ */
 public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 
 	private final static SQLQueryParserManager parserManager =

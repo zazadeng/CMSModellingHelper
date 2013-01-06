@@ -12,6 +12,7 @@ import com.lambdaworks.redis.RedisAsyncConnection;
 import com.lambdaworks.redis.RedisClient;
 import com.wcb.cms.modelmaker.api.CMSEntityDtlsDB;
 import com.wcb.cms.modelmaker.api.CMSEntityEntry;
+import com.wcb.cms.modelmaker.api.ErrorMessages;
 
 public class RedisConnector implements CMSEntityDtlsDB{
 
@@ -35,9 +36,7 @@ public class RedisConnector implements CMSEntityDtlsDB{
 						.setAttribute(
 								findPatternFrom("Attribute:", string));
 			}catch(NullPointerException e){
-				throw new IOException("There is NO return value from the presistence; please check if this column <"
-						+ cmsEntityEntry.getColumn() + "> is indeed in table <"
-						+ cmsEntityEntry.getTable() + ">.");
+				throw new IOException(ErrorMessages.error1(cmsEntityEntry.getColumn(), cmsEntityEntry.getTable()));
 			}
 		}
 	}
@@ -85,9 +84,7 @@ public class RedisConnector implements CMSEntityDtlsDB{
 		while(matcher.find()){
 			return matcher.group().replaceFirst(pattern, "").replaceFirst("\\W", "");
 		}
-		throw new IOException("This returned value \""
-				+ jsonString
-				+ "\" is not formatted correctly, please check on the persistent entry.");
+		throw new IOException(ErrorMessages.error2(jsonString));
 	}
 
 	private void setFutureReturnValueIn(CMSEntityEntry entry, Future<List<String>> futureKeys)

@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.wcb.cms.modelmaker.api.AppInterface;
 import com.wcb.cms.modelmaker.api.CMSRoseModellingResult;
+import com.wcb.cms.modelmaker.api.ErrorMessages;
 
 
 
@@ -128,10 +129,9 @@ public class ModellingResult extends HttpServlet {
 			String jndiName = "osgi:service/"+AppInterface.class.getName();
 			application = (AppInterface) ctx.lookup(jndiName);
 		} catch (NamingException e) {
-			getServletContext().log("Can't find name ", e);
-			throw new ServletException("can NOT find this service: "
-					+ e.getExplanation());
-			//+ e.getLocalizedMessage());
+			getServletContext().log("Can't find OSGi Service: ", e);
+			throw new ServletException(ErrorMessages
+					.error3(AppInterface.class.getName(), e.getExplanation()));
 		}
 	}
 

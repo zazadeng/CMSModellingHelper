@@ -9,7 +9,7 @@ a web app (java OSGi servlet) to help easing WCB CMS development modelling part 
 
 2. Download [NETTY](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22io.netty%22%20AND%20a%3A%22netty%22)(3.5.9.Final.jar) and [Lettuce](http://search.maven.org/#search%7Cga%7C1%7Clettuce)(lettuce-2.2.0.jar); put these two JARs under com.wcb.cms.modelmaker.redis/BundleContent and reflesh this project, right click the jar and do "Build Path -> Add to Build Path". Put this jar in com.wcb.cms.modelmaker.persistent.sqlite/BundleContent, and do the same thing as mentioned before to add this jar into the build path of the project. Also, add these two JARs to the Classpath under the Runtime tab in the MANIFEST.MF file.
 
-3. Download [geronimo](http://geronimo.apache.org)(geronimo-tomcat7-javaee6-3.0.0), remember this location, it will be needed for the coming step.
+3. Download [Geronimo](http://geronimo.apache.org)(geronimo-tomcat7-javaee6-3.0.0), remember this location, it will be needed for the coming step.
 
 4. In Eclipse, download the *OSGi Application Developement Tools* through Eclipse Marketplace("Help" -> "Marketplace...").
 
@@ -74,6 +74,12 @@ a web app (java OSGi servlet) to help easing WCB CMS development modelling part 
 	*For production*, get the web server geronimo(geronimo-tomcat7-javaee6-3.0.0) runnnig and put this OSGi bundle(through right-clicking cms.wcb.cms.modelmaker, and "Export" -> "OSGi application" in Eclipse) in the **hotbundles** folder;
 
 3. 	localhost:8080 will give us the server; and now http://localhost:8080/modelmaker/ will direct us to the home.jsp of this web service; attempt to run a query in this jsp will return us a pain result (Jason format); try firing up SqlHelperClientWebApp.html under /Dart/SqlHelperClientWebApp to give us a more intuitive representation of the result.
+
+##Integration Testing, the programmer-oriented way
+As programmers, we will not use our bare eyes(**by dumping SQLs documenting in a spreadsheet into the app one by one**) to test cases and we love to document all the cases in Junit fashion. Pax Exam and Karaf could be useful when tests get really big, but for now, I decide to roll my own test bundle(com.wcb.cms.modelmaker.integrationtest) and dump it in production container(instead of a smaller lightweight container which is promoted by Karaf). So we will do the following steps in Eclipse to get each test cases documented:
+
+1.	add tests in IntegrationTest.java,
+2.	run both com.wcb.cms.modelmaker and com.wcb.cms.modelmaker.integrationtest (by adding then the server) under the Geronimo server. We will see the test result in the console. It will be definitely helpful if we run server in debug mode.
 
 ##TODOs
 - make the servlet async.
