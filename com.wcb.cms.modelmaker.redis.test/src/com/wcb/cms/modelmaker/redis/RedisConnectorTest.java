@@ -87,7 +87,19 @@ public class RedisConnectorTest {
 	}
 
 	@Test(expected = IOException.class)
-	public void testAddDomainDefinition_IOException() throws Exception{
+	public void testAddAttributeAndDomainDefinition_DBRecordNotFound() throws Exception{
+		List<CMSEntityEntry> testList = new ArrayList<>();
+		CMSEntityEntry entry = new CMSEntityEntry();
+
+		entry.setFutureDBValue(makeMockFuture(null));
+		testList.add(entry);
+
+		redisConnector.addAttributeAndDomainDefinition(testList);
+
+	}
+
+	@Test(expected = IOException.class)
+	public void testAddDomainDefinition_DBRecordIncorrectFormat() throws Exception{
 		List<CMSEntityEntry> testList = new ArrayList<>();
 		CMSEntityEntry entry = new CMSEntityEntry();
 
@@ -127,5 +139,4 @@ public class RedisConnectorTest {
 			assertTrue(cmsEntityEntry.getFutureDBReturnValue() == null);
 		}
 	}
-
 }

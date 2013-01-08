@@ -370,7 +370,7 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 	}
 
 	@Override
-	public List<CMSEntityEntry> retrieveConstantAndVariable(
+	public final List<CMSEntityEntry> retrieveConstantAndVariable(
 			String selectQuery) throws SQLParserException, SQLParserInternalException {
 
 		final Map<String, Map<String, List<String>>> expMap = new Hashtable<String, Map<String, List<String>>>();
@@ -393,7 +393,7 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 
 
 	@Override
-	public List<CMSEntityEntry> retrieveIntoClause(String selectQuery) throws SQLParserException, SQLParserInternalException {
+	public final List<CMSEntityEntry> retrieveIntoClause(String selectQuery) throws SQLParserException, SQLParserInternalException {
 
 		QuerySelect selectQueryObject = getFirstQuerySelect(selectQuery);
 		EList<?> selectClauseColumns = selectQueryObject.getSelectClause();
@@ -411,6 +411,7 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 				.setSqlElement(STAR)
 				.setColumn(column)
 				.setPotentialTableList(map.get(column)));
+				map.get(column).add("XXXXXXXXXXXXX");
 			}
 			return list;
 		}

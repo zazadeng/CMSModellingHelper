@@ -39,6 +39,8 @@ public final class CMSEntityEntry {
 		if(this.variableList == null){
 			this.variableList = new ArrayList<String>();
 		}
+		//no need to lock, the order of this variable list
+		// is not important ...
 		this.variableList.add(variable + UNDERSCORE +nextCharacter());
 		return this;
 	}
@@ -103,14 +105,14 @@ public final class CMSEntityEntry {
 		this.domainDefinition = domainDefinition;
 		return this;
 	}
-	public CMSEntityEntry setFutureDBValue(Future<String> future) {
-		this.futureDBValue = future;
+	public synchronized CMSEntityEntry setFutureDBValue(Future<String> future) {
+		futureDBValue = future;
 		return this;
 	}
 	public CMSEntityEntry setPotentialTableList(List<String> potentialTableList) {
-		this.potentialTableList = potentialTableList;
-		if(potentialTableList.size() == 1){
-			this.table = potentialTableList.get(0);
+		this.potentialTableList = Collections.list(Collections.enumeration(potentialTableList));//clone
+		if(this.potentialTableList.size() == 1){
+			this.table = this.potentialTableList.get(0);
 		}
 		return this;
 	}

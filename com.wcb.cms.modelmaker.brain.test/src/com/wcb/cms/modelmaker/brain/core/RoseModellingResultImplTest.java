@@ -181,4 +181,29 @@ public class RoseModellingResultImplTest {
 		assertEquals("OUTPUT_DOMAIN_4", outputStruct.get("name_d"));
 	}
 
+	@Test
+	public void testSTARCase(){
+		String selectQuery = "select * from wcoclaim where claimid = :id";
+		List<CMSEntityEntry> outputList = new ArrayList<CMSEntityEntry>();
+
+		CMSEntityEntry entry = new CMSEntityEntry();
+		entry.setSqlElement("PL.PLANNEDITEMID");
+		entry.setAttribute("plannedItemID");
+		entry.setDomainDefinition("OUTPUT_DOMAIN_1");
+		outputList.add(entry);
+
+		List<CMSEntityEntry> inputList = new ArrayList<CMSEntityEntry>();
+
+		//1
+		entry = new CMSEntityEntry();
+		entry.setSqlElement("C.INTEGRATEDCASEID = :claimID");
+		entry.setAttribute("claimID");
+		entry.setDomainDefinition("DOMAIN_1");
+		inputList.add(entry);
+
+		roseModellingResultImpl =
+				new RoseModellingResultImpl(selectQuery , outputList , inputList);
+		String result = roseModellingResultImpl.getCuramNonStandardSelectQuery();
+		System.out.println(result);//TODO
+	}
 }

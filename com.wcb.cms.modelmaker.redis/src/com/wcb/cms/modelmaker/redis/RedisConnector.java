@@ -62,13 +62,13 @@ public class RedisConnector implements CMSEntityDtlsDB{
 
 		for (CMSEntityEntry entry : sqlElements) {
 			try {
-				Future<List<String>> futureKeys = asyncConnection.keys(entry.getTable() + "_" + entry.getColumn());
-				setFutureReturnValueIn(entry, futureKeys);
+				setFutureReturnValueIn(entry,
+						asyncConnection.keys(entry.getTable() + "_" + entry.getColumn()));
 
 				if(entry.getPotentialTableList().size() > 1){
 					for (String table : entry.getPotentialTableList()) {
-						futureKeys = asyncConnection.keys(table + "_" + entry.getColumn());
-						setFutureReturnValueIn(entry, futureKeys);
+						setFutureReturnValueIn(entry,
+								asyncConnection.keys(table + "_" + entry.getColumn()));
 					}
 
 				}

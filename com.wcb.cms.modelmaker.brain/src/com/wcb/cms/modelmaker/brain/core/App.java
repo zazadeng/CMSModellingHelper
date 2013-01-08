@@ -32,6 +32,11 @@ public class App implements AppInterface {
 	 */
 	private SelectQueryReader selectQueryReader;
 
+	@Override
+	public void close() {
+		cmsEntityDtlsDB.close();
+	}
+
 	// Injected via blueprint
 	public void setCmsEntityDtlsDB(CMSEntityDtlsDB cmsEntityDtlsDB) {
 		this.cmsEntityDtlsDB = cmsEntityDtlsDB;
@@ -46,13 +51,19 @@ public class App implements AppInterface {
 	public final CMSRoseModellingResult transformSelectQuery(final String selectQuery,
 			final String uri)
 					throws Exception {
-		final List<CMSEntityEntry> intoClauseList =
-				selectQueryReader.retrieveIntoClause(selectQuery);
+		/**
+		 * memory sharing zone: we will have only ONE instance of THIS initialized in the HTTP servlet
+		 */
+		List<CMSEntityEntry> intoClauseList;
+		List<CMSEntityEntry> constAndVarialbeList;
+		synchronized (this) {
+			intoClauseList =
+					selectQueryReader.retrieveIntoClause(selectQuery);
+			constAndVarialbeList =
+					selectQueryReader.retrieveConstantAndVariable(selectQuery);
+		}
 		cmsEntityDtlsDB.connect(uri);
 		cmsEntityDtlsDB.findInDB(intoClauseList);//Async
-
-		final List<CMSEntityEntry> constAndVarialbeList =
-				selectQueryReader.retrieveConstantAndVariable(selectQuery);
 		cmsEntityDtlsDB.findInDB(constAndVarialbeList);//Async
 
 		cmsEntityDtlsDB.addAttributeAndDomainDefinition(intoClauseList);

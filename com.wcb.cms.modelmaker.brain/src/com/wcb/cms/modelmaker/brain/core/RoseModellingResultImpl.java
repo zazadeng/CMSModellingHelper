@@ -27,39 +27,7 @@ public final class RoseModellingResultImpl implements CMSRoseModellingResult {
 		composeOutputStruct(intoClauseList);
 	}
 
-	/**
-	 * Updates variable field in the list of CMSEntityEntry and set the local field
-	 * @param sqlQuery
-	 * @param intoStatementMetaDataList
-	 * @param constAndVarialbeMetaDataList
-	 */
-	private void composeCuramNonStandardSelectQuery(String sqlQuery,
-			List<CMSEntityEntry> intoStatementMetaDataList,
-			List<CMSEntityEntry> constAndVarialbeMetaDataList) {
-
-		for (CMSEntityEntry entry : intoStatementMetaDataList) {
-			String variable = entry.getColumnAlias().isEmpty() ? entry.getAttribute() : entry.getColumnAlias();
-			//UPDATE
-			entry.addVariable(variable);
-			//REPALCE
-			sqlQuery = sqlQuery.replaceFirst(entry.getSqlElement(),
-					entry.getSqlElement()
-					+ "{" + entry.getVariable(variable)
-					+ "}");
-
-		}
-		int indexToInsert = sqlQuery.lastIndexOf("}") + 1;
-		Pattern pattern = Pattern.compile("\\{\\w+}");
-		Matcher matcher = pattern.matcher(sqlQuery);
-		String intoString = "INTO";
-		while(matcher.find()){
-			intoString += matcher.group().replaceFirst("\\{", ",:").replaceFirst("}", " \r\n");
-		}
-		intoString = intoString.replaceFirst("INTO,", "\r\n INTO \r\n");
-		sqlQuery = sqlQuery.substring(0, indexToInsert)
-				+ intoString + sqlQuery.substring(indexToInsert);
-		sqlQuery = sqlQuery.replaceAll("\\{\\w+}", "");
-
+	private String addConstantVarialbePlaceHolderIn(String sqlQuery, List<CMSEntityEntry> constAndVarialbeMetaDataList) {
 		for (CMSEntityEntry entry : constAndVarialbeMetaDataList) {
 			String replacement = entry.getSqlElement();
 			if(replacement.matches(".+'\\w+'.*")){
@@ -85,6 +53,46 @@ public final class RoseModellingResultImpl implements CMSRoseModellingResult {
 						replacement.replaceFirst(":.+", ":"+entry.getVariable(variable)));
 			}
 		}
+		return sqlQuery;
+	}
+
+	private String addIntoPlaceHolderIn(String sqlQuery, List<CMSEntityEntry> intoStatementMetaDataList) {
+		for (CMSEntityEntry entry : intoStatementMetaDataList) {
+			String variable = entry.getColumnAlias().isEmpty() ? entry.getAttribute() : entry.getColumnAlias();
+			//UPDATE
+			entry.addVariable(variable);
+			//REPALCE
+			sqlQuery = sqlQuery.replaceFirst(entry.getSqlElement(),
+					entry.getSqlElement()
+					+ "{" + entry.getVariable(variable)
+					+ "}");
+
+		}
+		int indexToInsert = sqlQuery.lastIndexOf("}") + 1;
+		Pattern pattern = Pattern.compile("\\{\\w+}");
+		Matcher matcher = pattern.matcher(sqlQuery);
+		String intoString = "INTO";
+		while(matcher.find()){
+			intoString += matcher.group().replaceFirst("\\{", ",:").replaceFirst("}", " \r\n");
+		}
+		intoString = intoString.replaceFirst("INTO,", "\r\n INTO \r\n");
+		sqlQuery = sqlQuery.substring(0, indexToInsert)
+				+ intoString + sqlQuery.substring(indexToInsert);
+		sqlQuery = sqlQuery.replaceAll("\\{\\w+}", "");
+		return sqlQuery;
+	}
+
+	/**
+	 * Updates variable field in the list of CMSEntityEntry and set the local field
+	 * @param sqlQuery
+	 * @param intoStatementMetaDataList
+	 * @param constAndVarialbeMetaDataList
+	 */
+	private void composeCuramNonStandardSelectQuery(String sqlQuery,
+			List<CMSEntityEntry> intoStatementMetaDataList,
+			List<CMSEntityEntry> constAndVarialbeMetaDataList) {
+		sqlQuery = addIntoPlaceHolderIn(sqlQuery, intoStatementMetaDataList);
+		sqlQuery = addConstantVarialbePlaceHolderIn(sqlQuery, constAndVarialbeMetaDataList);
 		this.dynamicSql = sqlQuery;
 	}
 
