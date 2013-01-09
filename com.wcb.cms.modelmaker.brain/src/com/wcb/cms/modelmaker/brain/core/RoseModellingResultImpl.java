@@ -1,8 +1,11 @@
 package com.wcb.cms.modelmaker.brain.core;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,17 +17,20 @@ import com.wcb.cms.modelmaker.api.CMSRoseModellingResult;
  */
 public final class RoseModellingResultImpl implements CMSRoseModellingResult {
 
+	private static final String STAR = "*";
 	private String dynamicSql;
-	private Map<String, String> inputStruct;
-	private Map<String, String> outputStruct;
+	private final Map<String, String> inputStruct;
+	private final Map<String, String> outputStruct;
 
 	public RoseModellingResultImpl(String selectQuery,
 			List<CMSEntityEntry> intoClauseList,
 			List<CMSEntityEntry> constAndVarialbeList) {
 		CMSEntityEntry.resetVariableSuffix();
 		composeCuramNonStandardSelectQuery(selectQuery, intoClauseList, constAndVarialbeList);
-		composeInputStruct(constAndVarialbeList);
-		composeOutputStruct(intoClauseList);
+		inputStruct = new Hashtable<>(constAndVarialbeList.size());
+		composeStruct(constAndVarialbeList, inputStruct);
+		outputStruct = new Hashtable<>(intoClauseList.size());
+		composeStruct(intoClauseList, outputStruct);
 	}
 
 	private String addConstantVarialbePlaceHolderIn(String sqlQuery, List<CMSEntityEntry> constAndVarialbeMetaDataList) {
@@ -34,9 +40,9 @@ public final class RoseModellingResultImpl implements CMSRoseModellingResult {
 				Matcher theMatcher = Pattern.compile("'\\w+'").matcher(replacement);
 				while(theMatcher.find()){
 					String group = theMatcher.group();
-					String variable = entry.getAttribute()+"_"+group.replaceAll("\\W", "");
+					String variable = entry.getEntityAttribute()+"_"+group.replaceAll("\\W", "");
 					//UPDATE
-					entry.addVariable(variable);
+					entry.addToVariableAttrMap(variable, entry.getEntityAttribute());
 					replacement = replacement.replace(group,
 							":" + entry.getVariable(variable));
 				}
@@ -47,7 +53,7 @@ public final class RoseModellingResultImpl implements CMSRoseModellingResult {
 			}else{
 				String variable = replacement.replaceFirst(".+:", "");
 				//UPDATE
-				entry.addVariable(variable);
+				entry.addToVariableAttrMap(variable, entry.getEntityAttribute());
 				//REPLACE
 				sqlQuery = sqlQuery.replaceFirst(replacement,
 						replacement.replaceFirst(":.+", ":"+entry.getVariable(variable)));
@@ -58,28 +64,59 @@ public final class RoseModellingResultImpl implements CMSRoseModellingResult {
 
 	private String addIntoPlaceHolderIn(String sqlQuery, List<CMSEntityEntry> intoStatementMetaDataList) {
 		for (CMSEntityEntry entry : intoStatementMetaDataList) {
-			String variable = entry.getColumnAlias().isEmpty() ? entry.getAttribute() : entry.getColumnAlias();
-			//UPDATE
-			entry.addVariable(variable);
-			//REPALCE
-			sqlQuery = sqlQuery.replaceFirst(entry.getSqlElement(),
-					entry.getSqlElement()
-					+ "{" + entry.getVariable(variable)
-					+ "}");
+			if(entry.getSqlElement().equals(STAR)){
+				Set<String> entityAttrs = entry.getEntityAttrSet();
+				StringWriter out = new StringWriter();
+				PrintWriter pw = new PrintWriter(out);//pw can do println, so I don't have to hardcode this "\n".
+				//StringBuilder intoClause = new StringBuilder();
+				for (String entityAttr : entityAttrs) {
+					String[] split = entityAttr.split("\\.");//e.g. claimcycle.claimcycleid
 
+					//UPDATE
+					entry.addToVariableAttrMap(split[1], entityAttr);//so we will have attr_a mapping to attr
+					String tableAlias = entry.getTableAlias(split[0].toUpperCase());
+					pw.println(","+
+							tableAlias+"."+split[1]
+									+"{"+entry.getVariable(split[1])+"}");//e.g.: cc.claimcycleid{claimcycleid_a}
+				}
+				//REPLACE
+				sqlQuery = sqlQuery.replaceFirst("[*@]", "@"+ out.toString());
+				pw.close();
+			}else{
+				String variable = entry.getColumnAlias().isEmpty() ? entry.getEntityAttribute() : entry.getColumnAlias();
+				//UPDATE
+				entry.addToVariableAttrMap(variable, entry.getEntityAttribute());
+				//REPALCE
+				sqlQuery = sqlQuery.replaceFirst(entry.getSqlElement(),
+						entry.getSqlElement()
+						+ "{" + entry.getVariable(variable)
+						+ "}");
+			}
 		}
-		int indexToInsert = sqlQuery.lastIndexOf("}") + 1;
+		int indexToInsertIntoClause = sqlQuery.indexOf("INTO");
+		String intoString = "";
+		boolean addComma = false;
+		if(indexToInsertIntoClause == -1){
+			indexToInsertIntoClause = sqlQuery.lastIndexOf("}") + 1;
+			intoString = "\r\n INTO \r\n";
+		}else{
+			indexToInsertIntoClause = indexToInsertIntoClause + "INTO ".length();
+			addComma = true;
+		}
 		Pattern pattern = Pattern.compile("\\{\\w+}");
 		Matcher matcher = pattern.matcher(sqlQuery);
-		String intoString = "INTO";
+		String cols = "";
 		while(matcher.find()){
-			intoString += matcher.group().replaceFirst("\\{", ",:").replaceFirst("}", " \r\n");
+			cols += matcher.group().replaceFirst("\\{", ",:").replaceFirst("}", " \r\n");
 		}
-		intoString = intoString.replaceFirst("INTO,", "\r\n INTO \r\n");
-		sqlQuery = sqlQuery.substring(0, indexToInsert)
-				+ intoString + sqlQuery.substring(indexToInsert);
+		cols = cols.substring(1);//trim the ","
+		intoString +=cols.trim();
+
+		sqlQuery = sqlQuery.substring(0, indexToInsertIntoClause)
+				+ intoString + (addComma ? "\r\n,"+sqlQuery.substring(indexToInsertIntoClause).trim() : sqlQuery.substring(indexToInsertIntoClause));
 		sqlQuery = sqlQuery.replaceAll("\\{\\w+}", "");
-		return sqlQuery;
+
+		return sqlQuery.replaceFirst("@,", "");
 	}
 
 	/**
@@ -96,32 +133,14 @@ public final class RoseModellingResultImpl implements CMSRoseModellingResult {
 		this.dynamicSql = sqlQuery;
 	}
 
-	private void composeInputStruct(
-			List<CMSEntityEntry> input) {
-		if(this.inputStruct == null){
-			this.inputStruct = new Hashtable<>(input.size());//Could be more, we have a IN predicate, but probability is lower for IN
-		}
-		for (CMSEntityEntry entry : input) {
-			List<String> variableList = entry.getVariableList();
+	private void composeStruct(
+			List<CMSEntityEntry> list, Map<String, String> strutMap) {
+		for (CMSEntityEntry entry : list) {
+			Set<String> variableList = entry.getVariableSet();
 			for (String variable : variableList) {
-				inputStruct.put(variable, entry.getDomainDefinition());
+				strutMap.put(variable, entry.getDomainDefinition(entry.getAttribute(variable)));
 			}
 		}
-
-	}
-
-	private void composeOutputStruct(
-			List<CMSEntityEntry> output) {
-		if(this.outputStruct == null){
-			this.outputStruct = new Hashtable<>(output.size());
-		}
-		for (CMSEntityEntry entry : output) {
-			List<String> variableList = entry.getVariableList();
-			for (String variable : variableList) {
-				outputStruct.put(variable, entry.getDomainDefinition());
-			}
-		}
-
 	}
 
 	/* (non-Javadoc)

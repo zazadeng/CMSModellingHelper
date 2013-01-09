@@ -237,7 +237,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 				assertTrue("We should NOT see this table " + table + " in the list",
 						table.equals("FUNCTION:COUNT"));
 			}
-			assertTrue(cmsEntityEntry.isFunction());
 		}
 
 		/*assertEquals(1, retrieveIntoClause.size());
@@ -269,7 +268,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 				assertTrue("We should NOT see this table " + table + " in the list",
 						table.equals("FUNCTION:DATE"));
 			}
-			assertTrue(cmsEntityEntry.isFunction());
 		}
 
 		/*assertEquals(1, retrieveIntoClause.size());
@@ -302,7 +300,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 				assertTrue("We should NOT see this table " + table + " in the list",
 						table.equals("FUNCTION:DATE"));
 			}
-			assertTrue(cmsEntityEntry.isFunction());
 		}
 		/*assertEquals(1, retrieveIntoClause.size());
 		list = retrieveIntoClause.get("BUSADDEDDTM_DATE");
@@ -329,7 +326,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 					assertTrue("We should NOT see this table " + table + " in the list",
 							table.equals("claimcycle".toUpperCase()));
 				}
-				assertTrue(cmsEntityEntry.isFunction() == false);
 			}else if(cmsEntityEntry.getColumn().equals("INTEGER")){
 				assertEquals("CAST ( NULL AS INTEGER) MONTHLYEARNINGS", cmsEntityEntry.getSqlElement());
 				assertEquals("MONTHLYEARNINGS", cmsEntityEntry.getColumnAlias());
@@ -339,7 +335,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 					assertTrue("We should NOT see this table " + table + " in the list",
 							table.equals("FUNCTION:CAST"));
 				}
-				assertTrue(cmsEntityEntry.isFunction());
 			}else{
 				fail("We shouldn't see other cases!");
 			}
@@ -381,7 +376,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 				assertTrue("We should NOT see this table " + table + " in the list",
 						table.equals("ClaimCycle".toUpperCase())|| table.equals("wcoclaim".toUpperCase()));
 			}
-			assertTrue(cmsEntityEntry.isFunction() == false);
 		}
 
 		/*assertEquals(1, retrieveIntoClause.size());
@@ -403,14 +397,12 @@ public class SelectQueryReaderDTPPlugInImplTest {
 		for (CMSEntityEntry cmsEntityEntry : retrieveIntoClause) {
 			assertEquals("*", cmsEntityEntry.getSqlElement());
 			assertEquals("*", cmsEntityEntry.getColumn());
-			assertEquals("", cmsEntityEntry.getColumnAlias());
 			assertEquals("", cmsEntityEntry.getTable());
 			assertEquals(2, cmsEntityEntry.getPotentialTableList().size());
 			for (String table : cmsEntityEntry.getPotentialTableList()) {
 				assertTrue("We should NOT see this table " + table + " in the list",
 						table.equals("ClaimCycle".toUpperCase())|| table.equals("wcoclaim".toUpperCase()));
 			}
-			assertTrue(cmsEntityEntry.isFunction() == false);
 		}
 
 		/*list = retrieveIntoClause.get("*");
@@ -431,59 +423,93 @@ public class SelectQueryReaderDTPPlugInImplTest {
 		for (CMSEntityEntry cmsEntityEntry : retrieveIntoClause) {
 			assertEquals("*", cmsEntityEntry.getSqlElement());
 			assertEquals("*", cmsEntityEntry.getColumn());
-			assertEquals("", cmsEntityEntry.getColumnAlias());
 			assertEquals("claimcycle".toUpperCase(), cmsEntityEntry.getTable());
 			assertEquals(1, cmsEntityEntry.getPotentialTableList().size());
 			for (String table : cmsEntityEntry.getPotentialTableList()) {
 				assertTrue("We should NOT see this table " + table + " in the list",
 						table.equals("ClaimCycle".toUpperCase()));}
-			assertTrue(cmsEntityEntry.isFunction() == false);
 		}
-
-		/*list = retrieveIntoClause.get("*");
-		assertEquals(1, list.size());
-		for (String table : list) {
-			assertTrue("We should NOT see this table " + table + " in the list",
-					table.equals("ClaimCycle".toUpperCase()));
-		}*/
 
 		/*
 		 * Select:	*
 		 * From:	Query Select
 		 */
-		selectQuery = "select * from (select claimcycleid from claimcycle,caseheader) cc, wcoclaim";
+		selectQuery = "select * from (select claimcycleid from claimcycle, caseheader caaaa) cc, wcoclaim wc";
 		retrieveIntoClause = selectQueryReaderDTPPlugInImpl.retrieveIntoClause(selectQuery);
 		assertEquals(2, retrieveIntoClause.size());
 		for (CMSEntityEntry cmsEntityEntry : retrieveIntoClause) {
 			if(cmsEntityEntry.getColumn().equals("*")){
 				assertEquals("*", cmsEntityEntry.getSqlElement());
 				assertEquals("", cmsEntityEntry.getColumnAlias());
+				assertEquals("*", cmsEntityEntry.getColumn());
 				assertEquals("wcoclaim".toUpperCase(), cmsEntityEntry.getTable());
+				assertEquals("wc".toUpperCase(), cmsEntityEntry.getTableAlias(cmsEntityEntry.getTable()));
 				assertEquals(1, cmsEntityEntry.getPotentialTableList().size());
-				assertTrue(cmsEntityEntry.isFunction() == false);
+				assertEquals("wcoclaim".toUpperCase(), cmsEntityEntry.getPotentialTableList().get(0));
+
 			}else if(cmsEntityEntry.getColumn().equals("claimcycleid".toUpperCase())){
 				assertEquals("*", cmsEntityEntry.getSqlElement());
 				assertEquals("", cmsEntityEntry.getColumnAlias());
-				assertEquals("", cmsEntityEntry.getTable());
+				assertEquals("", cmsEntityEntry.getTable());//NOT set, cuz we have more than one!
+				assertEquals("claimcycleid".toUpperCase(), cmsEntityEntry.getColumn());
+				assertEquals("cc".toUpperCase(), cmsEntityEntry.getTableAlias("claimcycle".toUpperCase()));
 				assertEquals(2, cmsEntityEntry.getPotentialTableList().size());
 				for (String table : cmsEntityEntry.getPotentialTableList()) {
 					assertTrue("We should NOT see this table " + table + " in the list",
 							table.equals("ClaimCycle".toUpperCase()) || table.equals("caseheader".toUpperCase()));
 				}
-				assertTrue(cmsEntityEntry.isFunction() == false);
 			}else{
 				fail("We shouldn't see other cases!");
 			}
 		}
 
-		/*list = retrieveIntoClause.get("*");
-		assertEquals(0, list.size());
-		list = retrieveIntoClause.get("claimcycleid".toUpperCase());
-		assertEquals(2, list.size());
-		for (String table : list) {
-			assertTrue("We should NOT see this table " + table + " in the list",
-					table.equals("ClaimCycle?".toUpperCase()) || table.equals("caseheader?".toUpperCase()));
-		}*/
+		/*
+		 * Select:	*
+		 * From:	Query Select, two "cc", DB2 will NOT complain ...
+		 * but we should throw an error, because later when we try to replace "*" with cc.claimcycleid,
+		 * DB2 will complain
+		 */
+		selectQuery = "select * from (select claimcycleid from claimcycle, caseheader caaaa) cc, claimcycle cc";
+		try{
+			retrieveIntoClause = selectQueryReaderDTPPlugInImpl.retrieveIntoClause(selectQuery);
+		}catch(Exception e){
+			//TODO
+		}
+
+		/*
+		 * Select:	*
+		 * From:	Query Select, two "cc", DB2 will complain ...
+		 * and we should as well ...
+		 */
+		selectQuery = "select cc.claimcycleid from (select claimcycleid from claimcycle, caseheader caaaa) cc, claimcycle cc";
+		try{
+			retrieveIntoClause = selectQueryReaderDTPPlugInImpl.retrieveIntoClause(selectQuery);
+		}catch(Exception e){
+			//TODO
+		}
+		/*
+		 * Select:	cc.claimcycleid, that is fine. no ambiguity ...
+		 * and we should as well ...
+		 */
+		selectQuery = "select cc1.claimcycleid from (select claimcycleid from claimcycle, caseheader caaaa) cc1, claimcycle cc2";
+		retrieveIntoClause = selectQueryReaderDTPPlugInImpl.retrieveIntoClause(selectQuery);
+		assertEquals(1, retrieveIntoClause.size());
+		for (CMSEntityEntry cmsEntityEntry : retrieveIntoClause) {
+			if(cmsEntityEntry.getColumn().equals("claimcycleid".toUpperCase())){
+				assertEquals("cc1.claimcycleid", cmsEntityEntry.getSqlElement());
+				assertEquals("", cmsEntityEntry.getColumnAlias());
+				assertEquals("", cmsEntityEntry.getTable());
+				assertEquals(2, cmsEntityEntry.getPotentialTableList().size());
+				assertEquals("CC1", cmsEntityEntry.getTableAlias("claimcycle".toUpperCase()));
+				assertEquals("CC1", cmsEntityEntry.getTableAlias("caseheader".toUpperCase())); //NOT "caaaa"
+				for (String table : cmsEntityEntry.getPotentialTableList()) {
+					assertTrue("We should NOT see this table " + table + " in the list",
+							table.equals("ClaimCycle".toUpperCase()) || table.equals("caseheader".toUpperCase()));
+				}
+			}else{
+				fail("We shouldn't see other cases!");
+			}
+		}
 
 
 
@@ -504,7 +530,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 				assertTrue("We should NOT see this table " + table + " in the list",
 						table.equals("ClaimCycle".toUpperCase())|| table.equals("wcoclaim".toUpperCase()));
 			}
-			assertTrue(cmsEntityEntry.isFunction() == false);
 		}
 
 

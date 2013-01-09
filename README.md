@@ -82,8 +82,9 @@ As programmers, we will not use our bare eyes(**by dumping SQLs documenting in a
 2.	run both com.wcb.cms.modelmaker and com.wcb.cms.modelmaker.integrationtest (by adding then the server) under the Geronimo server. We will see the test result in the console. It will be definitely helpful if we run server in debug mode.
 
 ##TODOs
-- make the servlet async.
+-JUNIT more
 
 ##REMOVED From TODOs
+- the servlet is async now. A load(in concurrency folder) test are added to check on 100 concurrent access.
 - a dart client side broswer app(this app will target any brower) will be used instead of do-it-all service from the server side: UI and Logic concerns are seperated now.
 - a dart implementation will be used to generate a redis-script file; of course for the database, we will be using Redis instead of Sqlite, so the dependency on *ANTLR* and *SqlJet* will be in the past.

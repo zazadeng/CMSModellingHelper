@@ -17,6 +17,7 @@ import org.eclipse.datatools.modelbase.sql.query.QuerySelect;
 import org.eclipse.datatools.modelbase.sql.query.QuerySelectStatement;
 import org.eclipse.datatools.modelbase.sql.query.QueryValueExpression;
 import org.eclipse.datatools.modelbase.sql.query.ResultColumn;
+import org.eclipse.datatools.modelbase.sql.query.TableCorrelation;
 import org.eclipse.datatools.modelbase.sql.query.TableExpression;
 import org.eclipse.datatools.modelbase.sql.query.TableInDatabase;
 import org.eclipse.datatools.modelbase.sql.query.TableJoined;
@@ -336,7 +337,11 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 
 	private List<String> lookUpTableInDatabase(TableInDatabase tableInDatabase,
 			String columnToFindTable) {
-		return Collections.singletonList(tableInDatabase.getName());
+		TableCorrelation tableCo = tableInDatabase.getTableCorrelation();
+		if(tableCo == null) {
+			return Collections.singletonList(tableInDatabase.getName());
+		}
+		return Collections.singletonList(tableInDatabase.getName()+"("+tableCo.getName()+")");
 	}
 
 	private List<String> lookUpTheFromClause(QuerySelect selectQueryObject, String theColumnToFindTable, Map<String, List<String>> map) {
@@ -354,6 +359,18 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 			list.addAll(findTableNameInTableInDatabaseFrom(tableRef, theColumnToFindTable));//TableInDatabase
 			list.addAll(findTableNameInTableJoinedFrom(tableRef, theColumnToFindTable, map));//TableJoined
 			list.addAll(findTableNameInQuerySelectFrom(tableRef, theColumnToFindTable, map));//QuerySelect
+			try{
+				QuerySelect qs = (QuerySelect)tableRef.eContainer();
+				TableCorrelation coRel = qs.getTableCorrelation();
+				if(coRel != null){
+					//reset
+					for (int i = 0; i< list.size(); i++) {
+						list.set(i, list.get(i).replaceFirst("\\(.+\\)", "") + "("+ coRel.getName()+")");
+					}
+				}
+			}catch(ClassCastException e){
+				//continues
+			}
 
 		}
 		return list;
@@ -383,9 +400,9 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 		}
 		List<CMSEntityEntry> list = new ArrayList<>();
 		for (String sqlElement : expMap.keySet()) {
-			list.add(new CMSEntityEntry().setSqlElement(sqlElement)
-					.setColumn(expMap.get(sqlElement).keySet().iterator().next())
-					.setTable(expMap.get(sqlElement).values().iterator().next().get(0)));
+			list.add(new CMSEntityEntry(expMap.get(sqlElement).keySet().iterator().next())
+			.setSqlElement(sqlElement)
+			.addToPotentialTableList(Collections.singletonList(expMap.get(sqlElement).values().iterator().next().get(0))));
 		}
 		return list;
 
@@ -407,11 +424,10 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 			map.putAll(mapForStar);
 			List<CMSEntityEntry> list  = new ArrayList<>();
 			for (String column : map.keySet()) {
-				list.add(new CMSEntityEntry()
+				list.add(new CMSEntityEntry(column)
 				.setSqlElement(STAR)
-				.setColumn(column)
-				.setPotentialTableList(map.get(column)));
-				map.get(column).add("XXXXXXXXXXXXX");
+				.addToPotentialTableList(map.get(column)));
+
 			}
 			return list;
 		}
@@ -457,10 +473,9 @@ public final class SelectQueryReaderDTPPlugInImpl implements SelectQueryReader {
 
 			}
 			for (String column : map.keySet()) {
-				list.add(new CMSEntityEntry()
+				list.add(new CMSEntityEntry(column)
 				.setSqlElement(oneSelectClauseColumn.getSourceInfo().getSourceSnippet())
-				.setColumn(column)
-				.setPotentialTableList(map.get(column)));
+				.addToPotentialTableList(map.get(column)));
 			}
 		}
 

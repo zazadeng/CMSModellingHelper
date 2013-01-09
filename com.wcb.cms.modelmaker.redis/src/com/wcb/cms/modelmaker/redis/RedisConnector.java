@@ -28,15 +28,17 @@ public class RedisConnector implements CMSEntityDtlsDB{
 	@Override
 	public void addAttributeAndDomainDefinition(List<CMSEntityEntry> list) throws InterruptedException, ExecutionException, IOException{
 		for (CMSEntityEntry cmsEntityEntry : list) {
-			Future<String> returnValue = cmsEntityEntry.getFutureDBReturnValue();
-			try{
-				String string = returnValue.get();
-				cmsEntityEntry.setDomainDefinition(
-						findPatternFrom("DomainDef:", string))
-						.setAttribute(
-								findPatternFrom("Attribute:", string));
-			}catch(NullPointerException e){
+			List<Future<String>> futureList = cmsEntityEntry.getFutureDBReturnValueList();
+			if(futureList.isEmpty() && !cmsEntityEntry.isFunction()){
 				throw new IOException(ErrorMessages.error1(cmsEntityEntry.getColumn(), cmsEntityEntry.getTable()));
+			}
+			for (Future<String> future : futureList) {
+				String string = future.get();
+				cmsEntityEntry.addToAttrDomainDefMap(
+						findPatternFrom("EntityName:", string) + "."+ findPatternFrom("Attribute:", string),
+						findPatternFrom("DomainDef:", string)
+						);
+
 			}
 		}
 	}
@@ -62,15 +64,9 @@ public class RedisConnector implements CMSEntityDtlsDB{
 
 		for (CMSEntityEntry entry : sqlElements) {
 			try {
-				setFutureReturnValueIn(entry,
-						asyncConnection.keys(entry.getTable() + "_" + entry.getColumn()));
-
-				if(entry.getPotentialTableList().size() > 1){
-					for (String table : entry.getPotentialTableList()) {
-						setFutureReturnValueIn(entry,
-								asyncConnection.keys(table + "_" + entry.getColumn()));
-					}
-
+				for (String table : entry.getPotentialTableList()) {
+					setFutureReturnValueIn(entry,
+							asyncConnection.keys(table + "_" + entry.getColumn()));
 				}
 			} catch (InterruptedException | ExecutionException e) {
 				//That is ok
@@ -78,8 +74,8 @@ public class RedisConnector implements CMSEntityDtlsDB{
 		}
 	}
 
-	private String findPatternFrom(String pattern, String jsonString) throws IOException {
-		Pattern compile = Pattern.compile("("+ pattern+".+"+","+")|(" + pattern+".+"+"}"+ ")");
+	private String findPatternFrom(final String pattern, final String jsonString) throws IOException {
+		Pattern compile = Pattern.compile("("+ pattern+"\\w+"+","+")|(" + pattern+".+"+"}"+ ")");
 		Matcher matcher = compile.matcher(jsonString);
 		while(matcher.find()){
 			return matcher.group().replaceFirst(pattern, "").replaceFirst("\\W", "");
@@ -87,14 +83,14 @@ public class RedisConnector implements CMSEntityDtlsDB{
 		throw new IOException(ErrorMessages.error2(jsonString));
 	}
 
-	private void setFutureReturnValueIn(CMSEntityEntry entry, Future<List<String>> futureKeys)
+	private void setFutureReturnValueIn(CMSEntityEntry entry, Future<List<String>> futureTableColumnKeys)
 			throws InterruptedException, ExecutionException {
-		if(asyncConnection.awaitAll(futureKeys) == false){
-			asyncConnection.awaitAll(1, TimeUnit.NANOSECONDS, futureKeys);
-			setFutureReturnValueIn(entry, futureKeys);
+		if(asyncConnection.awaitAll(futureTableColumnKeys) == false){
+			asyncConnection.awaitAll(1, TimeUnit.NANOSECONDS, futureTableColumnKeys);
+			setFutureReturnValueIn(entry, futureTableColumnKeys);
 		}else{
-			for (String aKey : futureKeys.get()) {
-				entry.setFutureDBValue(asyncConnection.get(aKey));
+			for (String aKey : futureTableColumnKeys.get()) {
+				entry.addFutureDBValue(asyncConnection.get(aKey));
 			}
 		}
 	}
