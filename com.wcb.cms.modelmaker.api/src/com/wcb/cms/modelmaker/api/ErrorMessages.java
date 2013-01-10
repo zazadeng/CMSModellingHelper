@@ -36,4 +36,8 @@ public class ErrorMessages {
 		return "Can't find OSGi Service named: \"" + osgiServiceName+"\"\n"
 				+ reason;
 	}
+	public static String Error4(String tableAlias) {
+		return "This table alias <" + tableAlias
+				+ "> has NO or MORE THAN ONE associated tables.";
+	}
 }

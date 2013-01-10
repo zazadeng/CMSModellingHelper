@@ -170,7 +170,8 @@ public class RoseModellingResultImplTest {
 	}
 
 	@Test
-	public void testSTARCase(){
+	public void testSelectTableSTAR(){
+
 		String selectQuery = "select * from (select claimid from wcoclaim) w, caseHeader where w.claimid = :id";
 		List<CMSEntityEntry> outputList = new ArrayList<CMSEntityEntry>();
 
@@ -215,6 +216,45 @@ public class RoseModellingResultImplTest {
 		map = roseModellingResultImpl.getInputStruct();
 		assertEquals(1, map.size());
 		assertEquals("DOMAIN_1", map.get("id_d"));
+
+
+	}
+
+	//TODO
+	public void testSTARCase(){
+		String selectQuery = "select w.* from (select claimid from wcoclaim) w, caseHeader where w.claimid = :id";
+		List<CMSEntityEntry> outputList = new ArrayList<CMSEntityEntry>();
+
+		CMSEntityEntry entry = new CMSEntityEntry("claimid".toUpperCase());
+		entry.setSqlElement("w.*");
+		entry.addToPotentialTableList(Arrays.asList("WCOCLAIM(W)"));//DONE in reading query
+		entry.addToAttrDomainDefMap("WCOClaim.claimID", "OUTPUT_DOMAIN_1");//DONE in db access
+		outputList.add(entry);
+
+		List<CMSEntityEntry> inputList = new ArrayList<CMSEntityEntry>();
+
+		entry = new CMSEntityEntry("ColumnName");
+		entry.setSqlElement("w.claimid = :id");
+		entry.addToAttrDomainDefMap("id", "DOMAIN_1");
+		inputList.add(entry);
+
+		roseModellingResultImpl =
+				new RoseModellingResultImpl(selectQuery , outputList , inputList);
+		String result = roseModellingResultImpl.getCuramNonStandardSelectQuery();
+		System.out.println(result);
+		String expected = "select W.claimID\n" +
+				" INTO \r\n:claimID_a \r\n" +
+				" from (select claimid from wcoclaim) w, caseHeader where w.claimid = :id_d";
+		assertEquals(expected , result);
+		Map<String, String> map = roseModellingResultImpl.getOutputStruct();
+		assertEquals(1, map.size());
+		for (String key : map.keySet()) {
+			assertTrue(map.get(key).startsWith("OUTPUT") == true);
+		}
+
+		map = roseModellingResultImpl.getInputStruct();
+		assertEquals(1, map.size());
+		assertEquals("DOMAIN_1", map.get("id_b"));
 
 	}
 }

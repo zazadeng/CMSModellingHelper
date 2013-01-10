@@ -160,7 +160,7 @@ void submitSql(Event event) {
 sendSqlData(String data, onSuccess(HttpRequest req)) {
   HttpRequest req = new HttpRequest(); // create a new XHR
 
-  var url = "http://192.168.1.100:8080/modelmaker/ModellingResult";
+  var url = "http://localhost:8080/modelmaker/ModellingResult";
   req.open("POST", url); // POST, async
   req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   req.on.readyStateChange.add((Event e) {

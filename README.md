@@ -79,12 +79,13 @@ a web app (java OSGi servlet) to help easing WCB CMS development modelling part 
 As programmers, we will not use our bare eyes(**by dumping SQLs documenting in a spreadsheet into the app one by one**) to test cases and we love to document all the cases in Junit fashion. Pax Exam and Karaf could be useful when tests get really big, but for now, I decide to roll my own test bundle(com.wcb.cms.modelmaker.integrationtest) and dump it in production container(instead of a smaller lightweight container which is promoted by Karaf). So we will do the following steps in Eclipse to get each test cases documented:
 
 1.	add tests in IntegrationTest.java,
-2.	run both com.wcb.cms.modelmaker and com.wcb.cms.modelmaker.integrationtest (by adding then the server) under the Geronimo server. We will see the test result in the console. It will be definitely helpful if we run server in debug mode.
+2.	run both com.wcb.cms.modelmaker and com.wcb.cms.modelmaker.integrationtest (by adding then the server) under the Geronimo server. We will see the test result in the console. It will be definitely helpful if we run the server in debug mode.
 
 ##TODOs
--JUNIT more
+- Making the query part async.
+- More SQL tests
 
 ##REMOVED From TODOs
-- the servlet is async now. A load(in concurrency folder) test are added to check on 100 concurrent access.
+- the servlet is async now, so don't bother to debug through a browser(instead, use the process mentioning in Integration Testing section). A load(in concurrency folder) test are added to check on 100 concurrent access.
 - a dart client side broswer app(this app will target any brower) will be used instead of do-it-all service from the server side: UI and Logic concerns are seperated now.
 - a dart implementation will be used to generate a redis-script file; of course for the database, we will be using Redis instead of Sqlite, so the dependency on *ANTLR* and *SqlJet* will be in the past.

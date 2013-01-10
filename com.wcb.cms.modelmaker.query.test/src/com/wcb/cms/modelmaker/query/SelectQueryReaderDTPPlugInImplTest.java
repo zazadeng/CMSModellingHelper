@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.datatools.sqltools.parsers.sql.SQLParserException;
@@ -18,7 +19,7 @@ public class SelectQueryReaderDTPPlugInImplTest {
 	private final SelectQueryReaderDTPPlugInImpl selectQueryReaderDTPPlugInImpl =new SelectQueryReaderDTPPlugInImpl();
 
 
-	private void selectCASE() throws SQLParserException, SQLParserInternalException {
+	private void selectCASE() throws SQLParserException, SQLParserInternalException, IOException {
 		/*
 		 * Select: CASE column
 		 * from:
@@ -59,7 +60,7 @@ public class SelectQueryReaderDTPPlugInImplTest {
 	}
 
 	private void selectCOLUMN() throws SQLParserException,
-	SQLParserInternalException {
+	SQLParserInternalException, IOException {
 		/*
 		 * Select:	implicit referencing "claimcycleid"
 		 * From:	Query Select
@@ -138,12 +139,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 
 		}
 
-		/*list = retrieveIntoClause.get("claimid".toUpperCase());
-		assertEquals(1, list.size());
-		for (String table : list) {
-			assertTrue("We should NOT see this table " + table + " in the list",
-					table.equals("ClaimCycle".toUpperCase()));
-		}*/
 
 		/*
 		 * Select: 	one column
@@ -221,7 +216,7 @@ public class SelectQueryReaderDTPPlugInImplTest {
 	}
 
 	private void selectFUNCTION() throws SQLParserException,
-	SQLParserInternalException {
+	SQLParserInternalException, IOException {
 		/*
 		 * 
 		 */
@@ -356,7 +351,7 @@ public class SelectQueryReaderDTPPlugInImplTest {
 		}*/
 	}
 
-	private void selectSTAR() throws SQLParserException, SQLParserInternalException {
+	private void selectSTAR() throws SQLParserException, SQLParserInternalException , IOException {
 		String selectQuery = "";
 		/*
 		 * Select: 	*
@@ -473,7 +468,7 @@ public class SelectQueryReaderDTPPlugInImplTest {
 		try{
 			retrieveIntoClause = selectQueryReaderDTPPlugInImpl.retrieveIntoClause(selectQuery);
 		}catch(Exception e){
-			//TODO
+			//TODO: throw ambiguity query exception
 		}
 
 		/*
@@ -485,7 +480,7 @@ public class SelectQueryReaderDTPPlugInImplTest {
 		try{
 			retrieveIntoClause = selectQueryReaderDTPPlugInImpl.retrieveIntoClause(selectQuery);
 		}catch(Exception e){
-			//TODO
+			//TODO: throw ambiguity query exception
 		}
 		/*
 		 * Select:	cc.claimcycleid, that is fine. no ambiguity ...
@@ -542,18 +537,108 @@ public class SelectQueryReaderDTPPlugInImplTest {
 
 	}
 
+	private void selectTableSTAR() throws SQLParserException, SQLParserInternalException, IOException {
+		/*
+		 * Select: 	all table columns
+		 * from: 	Table in database
+		 * 
+		 */
+		String selectQuery = "select cc.* from ClaimCycle cc";
+		List<CMSEntityEntry> retrieveIntoClause = selectQueryReaderDTPPlugInImpl.retrieveIntoClause(selectQuery);
+		assertEquals(1, retrieveIntoClause.size());
+		for (CMSEntityEntry cmsEntityEntry : retrieveIntoClause) {
+			assertEquals("cc.*", cmsEntityEntry.getSqlElement());
+			assertEquals("*", cmsEntityEntry.getColumn());
+			assertEquals("ClaimCycle".toUpperCase(), cmsEntityEntry.getTable());
+			assertEquals("CC", cmsEntityEntry.getTableAlias(cmsEntityEntry.getTable()));
+			assertEquals(1, cmsEntityEntry.getPotentialTableList().size());
+			for (String table : cmsEntityEntry.getPotentialTableList()) {
+				assertTrue("We should NOT see this table " + table + " in the list",
+						table.equals("ClaimCycle".toUpperCase()));
+			}
+		}
+
+		/*
+		 * Select: 	all table columns
+		 * from: 	Query Select
+		 * 
+		 */
+		selectQuery = "select cc.* from (select * from claimcycle) cc";
+		retrieveIntoClause = selectQueryReaderDTPPlugInImpl.retrieveIntoClause(selectQuery);
+		assertEquals(1, retrieveIntoClause.size());
+		for (CMSEntityEntry cmsEntityEntry : retrieveIntoClause) {
+			assertEquals("cc.*", cmsEntityEntry.getSqlElement());
+			assertEquals("*", cmsEntityEntry.getColumn());
+			assertEquals("ClaimCycle".toUpperCase(), cmsEntityEntry.getTable());
+			assertEquals("CC", cmsEntityEntry.getTableAlias(cmsEntityEntry.getTable()));
+			assertEquals(1, cmsEntityEntry.getPotentialTableList().size());
+			for (String table : cmsEntityEntry.getPotentialTableList()) {
+				assertTrue("We should NOT see this table " + table + " in the list",
+						table.equals("ClaimCycle".toUpperCase()));
+			}
+		}
+
+		/*
+		 * Select: 	all table columns
+		 * from: 	Table in database
+		 * kk has no associated table
+		 */
+		selectQuery = "select kk.* from ClaimCycle cc";
+		try{
+			retrieveIntoClause = selectQueryReaderDTPPlugInImpl.retrieveIntoClause(selectQuery);
+			fail("TEST should not reach here!");
+		}catch(Exception e){
+			assertTrue(true);
+		}
+
+		/*
+		 * Select: 	all table columns
+		 * 
+		 */
+		selectQuery = "select cc.*, wc.* from ClaimCycle cc inner join wcoclaim wc on wc.claimid=cc.claimid inner join caseheader ch on ch.caseid = cc.claimcycleid";
+		retrieveIntoClause = selectQueryReaderDTPPlugInImpl.retrieveIntoClause(selectQuery);
+		assertEquals(2, retrieveIntoClause.size());
+		for (CMSEntityEntry cmsEntityEntry : retrieveIntoClause) {
+			if(cmsEntityEntry.getSqlElement().equals("cc.*")){
+				assertEquals("cc.*", cmsEntityEntry.getSqlElement());
+				assertEquals("*", cmsEntityEntry.getColumn());
+				assertEquals("ClaimCycle".toUpperCase(), cmsEntityEntry.getTable());
+				assertEquals("CC", cmsEntityEntry.getTableAlias(cmsEntityEntry.getTable()));
+				assertEquals(1, cmsEntityEntry.getPotentialTableList().size());
+				for (String table : cmsEntityEntry.getPotentialTableList()) {
+					assertTrue("We should NOT see this table " + table + " in the list",
+							table.equals("ClaimCycle".toUpperCase()));
+				}
+			}else if(cmsEntityEntry.getSqlElement().equals("wc.*")){
+				assertEquals("wc.*", cmsEntityEntry.getSqlElement());
+				assertEquals("*", cmsEntityEntry.getColumn());
+				assertEquals("wcoclaim".toUpperCase(), cmsEntityEntry.getTable());
+				assertEquals("WC", cmsEntityEntry.getTableAlias(cmsEntityEntry.getTable()));
+				assertEquals(1, cmsEntityEntry.getPotentialTableList().size());
+				for (String table : cmsEntityEntry.getPotentialTableList()) {
+					assertTrue("We should NOT see this table " + table + " in the list",
+							table.equals("wcoclaim".toUpperCase()));
+				}
+			}else{
+				fail("We shouldn't see this fragment: "+ cmsEntityEntry.getSqlElement());
+			}
+		}
+
+	}
+
 	@Test
 	public void testGetTableColumnsSet() {
 
 		try {
 			selectSTAR();
+			selectTableSTAR();
 			selectFUNCTION();
 			selectCOLUMN();
 			selectCASE();
 
-		} catch (SQLParserException | SQLParserInternalException e) {
-			fail("Ooopss... should not happen!");
+		} catch (SQLParserException | SQLParserInternalException | IOException e) {
 			e.printStackTrace();
+			fail("Ooopss... should not happen!");
 		}
 
 

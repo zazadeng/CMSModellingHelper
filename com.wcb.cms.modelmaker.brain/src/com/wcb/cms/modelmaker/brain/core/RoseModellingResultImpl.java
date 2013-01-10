@@ -64,7 +64,7 @@ public final class RoseModellingResultImpl implements CMSRoseModellingResult {
 
 	private String addIntoPlaceHolderIn(String sqlQuery, List<CMSEntityEntry> intoStatementMetaDataList) {
 		for (CMSEntityEntry entry : intoStatementMetaDataList) {
-			if(entry.getSqlElement().equals(STAR)){
+			if(entry.getSqlElement().endsWith(STAR)){
 				Set<String> entityAttrs = entry.getEntityAttrSet();
 				StringWriter out = new StringWriter();
 				PrintWriter pw = new PrintWriter(out);//pw can do println, so I don't have to hardcode this "\n".
@@ -80,6 +80,7 @@ public final class RoseModellingResultImpl implements CMSRoseModellingResult {
 									+"{"+entry.getVariable(split[1])+"}");//e.g.: cc.claimcycleid{claimcycleid_a}
 				}
 				//REPLACE
+
 				sqlQuery = sqlQuery.replaceFirst("[*@]", "@"+ out.toString());
 				pw.close();
 			}else{
