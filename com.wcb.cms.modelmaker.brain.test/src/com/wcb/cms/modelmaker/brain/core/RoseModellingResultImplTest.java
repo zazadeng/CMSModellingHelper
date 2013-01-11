@@ -268,5 +268,6 @@ public class RoseModellingResultImplTest {
 		assertEquals(1, map.size());
 		assertEquals("DOMAIN_1", map.get("id_d"));
 
+
 	}
 }

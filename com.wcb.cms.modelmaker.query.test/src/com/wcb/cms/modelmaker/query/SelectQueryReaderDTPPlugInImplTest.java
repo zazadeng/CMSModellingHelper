@@ -50,13 +50,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 			assertEquals("AEDCALCRESULT", cmsEntityEntry.getTable());
 
 		}
-		/*List<String> list = retrieveIntoClause.get("NEMTHAMT(MONTHLYEARNINGS)");
-		assertEquals(1, list.size());
-		for (String table : list) {
-			assertTrue("We should NOT see this table " + table + " in the list",
-					table.equals("AEDCALCRESULT"));
-		}*/
-
 	}
 
 	private void selectCOLUMN() throws SQLParserException,
@@ -74,12 +67,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 			assertEquals("ClaimCycle".toUpperCase(), cmsEntityEntry.getTable());
 
 		}
-		/*List<String> list = retrieveIntoClause.get("claimcycleid".toUpperCase());
-		assertEquals(1, list.size());
-		for (String table : list) {
-			assertTrue("We should NOT see this table " + table + " in the list",
-					table.equals("ClaimCycle".toUpperCase()));
-		}*/
 
 		/*
 		 * Select:	referencing "cc.claimcycleid"
@@ -94,13 +81,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 			assertEquals("ClaimCycle".toUpperCase(), cmsEntityEntry.getTable());
 
 		}
-
-		/*list = retrieveIntoClause.get("claimcycleid".toUpperCase());
-		assertEquals(1, list.size());
-		for (String table : list) {
-			assertTrue("We should NOT see this table " + table + " in the list",
-					table.equals("ClaimCycle".toUpperCase()));
-		}*/
 
 		/*
 		 * Select: 	a column from a nested Select query
@@ -118,12 +98,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 						table.equals("wcoclaim".toUpperCase())||table.equals("caseheader".toUpperCase()));
 			}
 		}
-		/*list = retrieveIntoClause.get("claimid".toUpperCase());
-		assertEquals(2, list.size());
-		for (String table : list) {
-			assertTrue("We should NOT see this table " + table + " in the list",
-					table.equals("wcoclaim?".toUpperCase())||table.equals("caseheader?".toUpperCase()));
-		}*/
 
 		/*
 		 * Select: 	one column
@@ -158,14 +132,7 @@ public class SelectQueryReaderDTPPlugInImplTest {
 						table.equals("wcoclaim".toUpperCase())||table.equals("ClaimCycle".toUpperCase()));
 			}
 		}
-
-		/*list = retrieveIntoClause.get("claimid".toUpperCase());
-		assertEquals(2, list.size());
-		for (String table : list) {
-			assertTrue("We should NOT see this table " + table + " in the list",
-					table.equals("ClaimCycle?".toUpperCase()) || table.equals("wcoclaim?".toUpperCase()));
-		}*/
-
+		
 		/*
 		 * Select: 	two columns
 		 * from: 	Table in database
@@ -196,23 +163,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 			}
 
 		}
-
-		/*assertEquals(2, retrieveIntoClause.size());
-		list = retrieveIntoClause.get("claimcycleid".toUpperCase());
-		assertEquals(2, list.size());
-		for (String table : list) {
-			assertTrue("We should NOT see this table " + table + " in the list",
-					table.equals("ClaimCycle?".toUpperCase()) || table.equals("wcoclaim?".toUpperCase()));
-		}
-		list = retrieveIntoClause.get("claimid".toUpperCase());
-		assertEquals(2, list.size());
-		for (String table : list) {
-			assertTrue("We should NOT see this table " + table + " in the list",
-					table.equals("ClaimCycle?".toUpperCase()) || table.equals("wcoclaim?".toUpperCase()));
-		}
-		 */
-
-
 	}
 
 	private void selectFUNCTION() throws SQLParserException,
@@ -233,14 +183,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 						table.equals("FUNCTION:COUNT"));
 			}
 		}
-
-		/*assertEquals(1, retrieveIntoClause.size());
-		List<String> list = retrieveIntoClause.get("COUNT");
-		assertEquals(1, list.size());
-		for (String table : list) {
-			assertTrue("We should NOT see this table " + table + " in the list",
-					table.equals("FUNCTION:COUNT"));
-		}*/
 
 		/*
 		 * Select: FUNCTION column
@@ -265,15 +207,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 			}
 		}
 
-		/*assertEquals(1, retrieveIntoClause.size());
-		list = retrieveIntoClause.get("DATE(APPROVAL_DATE)");
-		assertEquals(1, list.size());
-		for (String table : list) {
-			assertTrue("We should NOT see this table " + table + " in the list",
-					table.equals("FUNCTION:DATE"));
-		}*/
-
-
 		/*
 		 * Select: FUNCTION column with alias
 		 * from:
@@ -296,13 +229,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 						table.equals("FUNCTION:DATE"));
 			}
 		}
-		/*assertEquals(1, retrieveIntoClause.size());
-		list = retrieveIntoClause.get("BUSADDEDDTM_DATE");
-		assertEquals(1, list.size());
-		for (String table : list) {
-			assertTrue("We should NOT see this table " + table + " in the list",
-					table.equals("FUNCTION:DATE"));
-		}*/
 
 		/*
 		 * Select: two columns, the second one is acting as an empty variable (place holder),
@@ -334,21 +260,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 				fail("We shouldn't see other cases!");
 			}
 		}
-
-
-		/*assertEquals(2, retrieveIntoClause.size());
-		list = retrieveIntoClause.get("claimcycleid".toUpperCase());
-		assertEquals(1, list.size());
-		for (String table : list) {
-			assertTrue("We should NOT see this table " + table + " in the list",
-					table.equals("ClaimCycle".toUpperCase()));
-		}
-		list = retrieveIntoClause.get("INTEGER(MONTHLYEARNINGS)");
-		assertEquals(1, list.size());
-		for (String table : list) {
-			assertTrue("We should NOT see this table " + table + " in the list",
-					table.equals("FUNCTION:CAST"));
-		}*/
 	}
 
 	private void selectSTAR() throws SQLParserException, SQLParserInternalException , IOException {
@@ -390,14 +301,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 						table.equals("ClaimCycle".toUpperCase())|| table.equals("wcoclaim".toUpperCase()));
 			}
 		}
-
-		/*list = retrieveIntoClause.get("*");
-		assertEquals(2, list.size());
-		for (String table : list) {
-			assertTrue("We should NOT see this table " + table + " in the list",
-					table.equals("ClaimCycle".toUpperCase())|| table.equals("wcoclaim".toUpperCase()));
-		}
-		 */
 
 		/*
 		 * Select:	*
@@ -517,15 +420,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 						table.equals("ClaimCycle".toUpperCase())|| table.equals("wcoclaim".toUpperCase()));
 			}
 		}
-
-
-		/*list = retrieveIntoClause.get("*");
-		assertEquals(2, list.size());
-		for (String table : list) {
-			assertTrue("We should NOT see this table " + table + " in the list",
-					table.equals("ClaimCycle".toUpperCase())|| table.equals("wcoclaim".toUpperCase()));
-		}*/
-
 	}
 
 	private void selectTableSTAR() throws SQLParserException, SQLParserInternalException, IOException {
@@ -688,7 +582,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 				"	 AND OCA.OCCCLSAVGREGIONCD <> :regionCode)";
 		try {
 			List<CMSEntityEntry> retrieveConstantAndVariable = selectQueryReaderDTPPlugInImpl.retrieveConstantAndVariable(selectQuery);
-			//"{WPMCE.RECORDSTATUSCODE = 'RST1'={RECORDSTATUSCODE=[WKRPOTMTCALCEARN]}, CC.RECORDSTATUSCODE = 'RST1'={RECORDSTATUSCODE=[CLAIMCYCLE]}, OCCCLSAVGREGIONCD <> :regionCode={OCCCLSAVGREGIONCD=[OCCCLSAVGEARN]}, WPMCE.EARNAMTTYPECD = :earnAmtTypeCD={EARNAMTTYPECD=[WKRPOTMTCALCEARN]}, WPE.CLAIMCYCLEID = :claimCycleID={CLAIMCYCLEID=[WKRPOTEARN]}, WPE.RECORDSTATUSCODE = 'RST1'={RECORDSTATUSCODE=[WKRPOTEARN]}, WPE.WKRPOTEARNSTTSCD = 'Finalized'={WKRPOTEARNSTTSCD=[WKRPOTEARN]}}";
 			assertEquals(9, retrieveConstantAndVariable.size());
 			for (CMSEntityEntry cmsEntityEntry : retrieveConstantAndVariable) {
 				if(cmsEntityEntry.getSqlElement().equals("WPE.CLAIMCYCLEID=:claimCycleID")){
@@ -730,15 +623,6 @@ public class SelectQueryReaderDTPPlugInImplTest {
 					fail("Test shouldn't have this case!");
 				}
 			}
-			/*assertEquals("WKRPOTEARN", retrieveConstantAndVariable.get("WPE.CLAIMCYCLEID = :claimCycleID").get("CLAIMCYCLEID").get(0));
-			assertEquals("WKRPOTEARN", retrieveConstantAndVariable.get("WPE.WKRPOTEARNSTTSCD = 'Finalized'").get("WKRPOTEARNSTTSCD").get(0));
-			assertEquals("WKRPOTMTCALCEARN", retrieveConstantAndVariable.get("WPMCE.EARNAMTTYPECD = :earnAmtTypeCD").get("EARNAMTTYPECD").get(0));
-			assertEquals("WKRPOTEARN", retrieveConstantAndVariable.get("WPE.RECORDSTATUSCODE = 'RST1'").get("RECORDSTATUSCODE").get(0));
-			assertEquals("WKRPOTMTCALCEARN", retrieveConstantAndVariable.get("WPMCE.RECORDSTATUSCODE = 'RST1'").get("RECORDSTATUSCODE").get(0));
-			assertEquals("CLAIMCYCLE", retrieveConstantAndVariable.get("CC.RECORDSTATUSCODE = 'RST1'").get("RECORDSTATUSCODE").get(0));
-			assertEquals("OCCCLSAVGEARN", retrieveConstantAndVariable.get("OCCCLSAVGREGIONCD <> :regionCode").get("OCCCLSAVGREGIONCD").get(0));
-			assertEquals("WKRPOTMTCALCEARN", retrieveConstantAndVariable.get("YEAR(WPMCE.EARNCOLLECTYR) = :startDt").get("EARNCOLLECTYR").get(0));
-			assertEquals("WKRPOTEARN", retrieveConstantAndVariable.get("WPE.WKRPOTENARNTYPECD IN ('OCA', 'Actual Earnings')").get("WKRPOTENARNTYPECD").get(0));*/
 		} catch (SQLParserException | SQLParserInternalException e) {
 			e.printStackTrace();
 		}
