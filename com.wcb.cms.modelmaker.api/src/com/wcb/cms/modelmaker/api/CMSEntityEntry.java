@@ -31,12 +31,13 @@ public final class CMSEntityEntry {
 	public CMSEntityEntry(String col){
 		sqlElement = "";
 		column = col.replaceFirst("\\(.+", "");
-		String tempColumnAlias = col.replace(this.column+"(", "").replace(")", "");
+		/*String tempColumnAlias = col.replace(this.column+"(", "").replace(")", "");
 		if(column.equals(tempColumnAlias)){
 			columnAlias = "";
 		}else{
 			columnAlias = tempColumnAlias;
-		}
+		}*/
+		columnAlias = col.substring(column.length()).replaceAll("[\\(\\)]", "");
 		onlyTable = "";
 		//	tableAlias = "";
 		potentialTableList = Collections.emptyList();
@@ -92,14 +93,6 @@ public final class CMSEntityEntry {
 		this.variableAttrMap.put(variable + UNDERSCORE +nextCharacter(), attr);
 		return this;
 	}
-	public String getEntityAttribute() {
-		try{
-			return AttrDomainDefMap.keySet().toArray(new String[0])[0];
-		}catch(Exception e){
-			System.err.println("CMSEntityEntry.getAttribute() throws an exception: "+ e.getMessage());
-			return "";
-		}
-	}
 	public String getAttribute(String variable) {
 		return variableAttrMap.get(variable);
 	}
@@ -119,6 +112,14 @@ public final class CMSEntityEntry {
 	}
 	public String getDomainDefinition(String attribute) {
 		return AttrDomainDefMap.get(attribute);
+	}
+	public String getEntityAttribute() {
+		try{
+			return AttrDomainDefMap.keySet().toArray(new String[0])[0];
+		}catch(Exception e){
+			System.err.println("CMSEntityEntry.getAttribute() throws an exception: "+ e.getMessage());
+			return "";
+		}
 	}
 	public Set<String> getEntityAttrSet() {
 		return AttrDomainDefMap.keySet();

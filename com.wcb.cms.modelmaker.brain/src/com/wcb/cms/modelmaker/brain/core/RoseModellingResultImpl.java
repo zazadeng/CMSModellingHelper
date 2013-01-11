@@ -64,23 +64,24 @@ public final class RoseModellingResultImpl implements CMSRoseModellingResult {
 
 	private String addIntoPlaceHolderIn(String sqlQuery, List<CMSEntityEntry> intoStatementMetaDataList) {
 		for (CMSEntityEntry entry : intoStatementMetaDataList) {
-			if(entry.getSqlElement().equals(STAR)){
+			if(entry.getSqlElement().endsWith(STAR)){
 				Set<String> entityAttrs = entry.getEntityAttrSet();
 				StringWriter out = new StringWriter();
 				PrintWriter pw = new PrintWriter(out);//pw can do println, so I don't have to hardcode this "\n".
-				//StringBuilder intoClause = new StringBuilder();
 				for (String entityAttr : entityAttrs) {
 					String[] split = entityAttr.split("\\.");//e.g. claimcycle.claimcycleid
 
 					//UPDATE
 					entry.addToVariableAttrMap(split[1], entityAttr);//so we will have attr_a mapping to attr
 					String tableAlias = entry.getTableAlias(split[0].toUpperCase());
-					pw.println(","+
-							tableAlias+"."+split[1]
-									+"{"+entry.getVariable(split[1])+"}");//e.g.: cc.claimcycleid{claimcycleid_a}
+					pw.println(tableAlias+"."+split[1]
+							+"{"+entry.getVariable(split[1])+"}" +",");//e.g.: cc.claimcycleid{claimcycleid_a}
 				}
 				//REPLACE
-				sqlQuery = sqlQuery.replaceFirst("[*@]", "@"+ out.toString());
+				if(entry.getSqlElement().equals("*") == false){
+					sqlQuery = sqlQuery.replace(entry.getSqlElement(), "@");
+				}
+				sqlQuery = sqlQuery.replaceFirst("[*@]", out.toString() + "@");
 				pw.close();
 			}else{
 				String variable = entry.getColumnAlias().isEmpty() ? entry.getEntityAttribute() : entry.getColumnAlias();
@@ -93,30 +94,27 @@ public final class RoseModellingResultImpl implements CMSRoseModellingResult {
 						+ "}");
 			}
 		}
-		int indexToInsertIntoClause = sqlQuery.indexOf("INTO");
-		String intoString = "";
-		boolean addComma = false;
-		if(indexToInsertIntoClause == -1){
-			indexToInsertIntoClause = sqlQuery.lastIndexOf("}") + 1;
-			intoString = "\r\n INTO \r\n";
-		}else{
-			indexToInsertIntoClause = indexToInsertIntoClause + "INTO ".length();
-			addComma = true;
-		}
+		StringWriter out = new StringWriter();
+		PrintWriter pw = new PrintWriter(out);//pw can do println, so I don't have to hardcode this "\n".
+
+		int indexToInsertIntoClause = sqlQuery.lastIndexOf("}") + 1;
+		pw.println(sqlQuery.substring(0, indexToInsertIntoClause)); //SELECT CLAUSE
+		pw.println("INTO");
 		Pattern pattern = Pattern.compile("\\{\\w+}");
 		Matcher matcher = pattern.matcher(sqlQuery);
-		String cols = "";
 		while(matcher.find()){
-			cols += matcher.group().replaceFirst("\\{", ",:").replaceFirst("}", " \r\n");
+			pw.println(":"+matcher.group().replaceAll("[\\{}]", "") + ",");
 		}
-		cols = cols.substring(1);//trim the ","
-		intoString +=cols.trim();
+		pw.println("<FROM>");
+		String finalQuery = out.toString().replaceAll("\\{\\w+}", "");
+		pw.close();
 
-		sqlQuery = sqlQuery.substring(0, indexToInsertIntoClause)
-				+ intoString + (addComma ? "\r\n,"+sqlQuery.substring(indexToInsertIntoClause).trim() : sqlQuery.substring(indexToInsertIntoClause));
-		sqlQuery = sqlQuery.replaceAll("\\{\\w+}", "");
-
-		return sqlQuery.replaceFirst("@,", "");
+		finalQuery = finalQuery.substring(0, finalQuery.lastIndexOf(","))//trim the last ",";
+				+ finalQuery.substring(finalQuery.lastIndexOf(",")+1);//keep the FROM and the "\r\n" around it
+		String fromClause = sqlQuery.substring(indexToInsertIntoClause).replaceFirst("(F|f)(R|r)(O|o)(M|m)", "FROM");
+		fromClause = fromClause.substring(fromClause.indexOf("FROM"));//From clause
+		finalQuery = finalQuery.replace("<FROM>", fromClause).trim();
+		return finalQuery;
 	}
 
 	/**

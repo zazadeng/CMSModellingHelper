@@ -117,13 +117,13 @@ public class RoseModellingResultImplTest {
 		String expected = "SELECT PL.PLANNEDITEMID    ,\n" +
 				"       PL.NAME             ,\n" +
 				"       PL.DECISNOUTCMTYPECD,\n" +
-				"       SG.NAME\r\n" +
-				" INTO \r\n" +
-				":plannedItemID_a \r\n" +
-				",:name_b \r\n" +
-				",:decisnOutcmTypeCd_c \r\n" +
-				",:name_d\n" +
-				" FROM   PLANNEDITEM PL\n" +
+				"       SG.NAME\n" +
+				"INTO\n" +
+				":plannedItemID_a,\n" +
+				":name_b,\n" +
+				":decisnOutcmTypeCd_c,\n" +
+				":name_d\n" +
+				"FROM   PLANNEDITEM PL\n" +
 				"       INNER JOIN CASEHEADER C\n" +
 				"       ON C.CASEID = PL.CASEID\n" +
 				"       AND C.INTEGRATEDCASEID = :claimID_e\n" +
@@ -170,7 +170,8 @@ public class RoseModellingResultImplTest {
 	}
 
 	@Test
-	public void testSTARCase(){
+	public void testSelectTableSTAR(){
+
 		String selectQuery = "select * from (select claimid from wcoclaim) w, caseHeader where w.claimid = :id";
 		List<CMSEntityEntry> outputList = new ArrayList<CMSEntityEntry>();
 
@@ -197,14 +198,65 @@ public class RoseModellingResultImplTest {
 		roseModellingResultImpl =
 				new RoseModellingResultImpl(selectQuery , outputList , inputList);
 		String result = roseModellingResultImpl.getCuramNonStandardSelectQuery();
-		System.out.println(result);
-		String expected = "select W.claimID\n" +
-				",CASEHEADER.recordStatus\n" +
-				",CASEHEADER.caseID\r\n" +
-				" INTO \r\n:claimID_c \r\n" +
-				",:recordStatus_a \r\n" +
-				",:caseID_b\n" +
-				" from (select claimid from wcoclaim) w, caseHeader where w.claimid = :id_d";
+		//System.out.println(result);
+		String expected = "select CASEHEADER.recordStatus,\n" +
+				"CASEHEADER.caseID,\n" +
+				"W.claimID\n" +
+				"INTO\n" +
+				":recordStatus_a,\n" +
+				":caseID_b,\n" +
+				":claimID_c\n" +
+				"FROM (select claimid from wcoclaim) w, caseHeader where w.claimid = :id_d";
+		assertEquals(expected , result);
+		Map<String, String> map = roseModellingResultImpl.getOutputStruct();
+		assertEquals(3, map.size());
+		for (String key : map.keySet()) {
+			assertTrue(map.get(key).startsWith("OUTPUT") == true);
+		}
+
+		map = roseModellingResultImpl.getInputStruct();
+		assertEquals(1, map.size());
+		assertEquals("DOMAIN_1", map.get("id_d"));
+
+
+	}
+
+	@Test
+	public void testSTARCase(){
+		String selectQuery = "select w.*, ch.* from (select claimid from wcoclaim) w, caseHeader ch where w.claimid = ch.caseid and w.claimid = :id";
+		List<CMSEntityEntry> outputList = new ArrayList<CMSEntityEntry>();
+
+		CMSEntityEntry entry = new CMSEntityEntry("claimid".toUpperCase());
+		entry.setSqlElement("w.*");
+		entry.addToPotentialTableList(Arrays.asList("WCOCLAIM(W)"));//DONE in reading query
+		entry.addToAttrDomainDefMap("WCOClaim.claimID", "OUTPUT_DOMAIN_1");//DONE in db access
+		outputList.add(entry);
+
+		entry = new CMSEntityEntry("caseHeader".toUpperCase());
+		entry.setSqlElement("ch.*");
+		entry.addToPotentialTableList(Arrays.asList("caseHeader(ch)".toUpperCase()));//DONE in reading query
+		entry.addToAttrDomainDefMap("CaseHeader.caseID", "OUTPUT_DOMAIN_2");//DONE in db access
+		entry.addToAttrDomainDefMap("CaseHeader.recordStatus", "OUTPUT_DOMAIN_3");//DONE in db access
+		outputList.add(entry);
+
+		List<CMSEntityEntry> inputList = new ArrayList<CMSEntityEntry>();
+
+		entry = new CMSEntityEntry("ColumnName");
+		entry.setSqlElement("w.claimid = :id");
+		entry.addToAttrDomainDefMap("id", "DOMAIN_1");
+		inputList.add(entry);
+
+		roseModellingResultImpl =
+				new RoseModellingResultImpl(selectQuery , outputList , inputList);
+		String result = roseModellingResultImpl.getCuramNonStandardSelectQuery();
+		String expected = "select W.claimID,\n" +
+				"CH.recordStatus,\n" +
+				"CH.caseID\n" +
+				"INTO\n" +
+				":claimID_a,\n" +
+				":recordStatus_b,\n" +
+				":caseID_c\n" +
+				"FROM (select claimid from wcoclaim) w, caseHeader ch where w.claimid = ch.caseid and w.claimid = :id_d";
 		assertEquals(expected , result);
 		Map<String, String> map = roseModellingResultImpl.getOutputStruct();
 		assertEquals(3, map.size());

@@ -18,14 +18,18 @@
           <input type="text" name="textToReplace" id="textToReplace" >
           <button id="replaceButton" >replace</button>
       </div>
-      <table id = "result">
+      <div id = "result">
+       <table>
         <tr>
           <td id="sql" readonly>Formatted sql will be posted here!</td>
           <td id="input" readonly>Input struct will be posted here!</td>
           <td id="output" readonly>Output struct will be posted here!</td>
         </tr>
-      </table>
-      
+       </table>
+       <input type="button" value="cp SQL"/>
+       <input type="button" value="cp input"/>
+       <input type="button" value="cp output"/>
+      </div>
     </div>
 
     <script type="application/dart" src="SqlHelperClientWebApp.dart"></script>
